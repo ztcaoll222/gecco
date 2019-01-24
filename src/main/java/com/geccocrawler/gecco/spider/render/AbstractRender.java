@@ -42,7 +42,7 @@ public abstract class AbstractRender implements Render {
 	/**
 	 * 自定义注入
 	 */
-	private CustomFieldRenderFactory customFieldRenderFactory;
+	private CustomFieldRenderFactory defaultFieldRenderFactory;
 
 	public AbstractRender() {
 		this.requestFieldRender = new RequestFieldRender();
@@ -62,7 +62,7 @@ public abstract class AbstractRender implements Render {
 			for (Field customField : customFields) {
 				FieldRenderName fieldRender = customField.getAnnotation(FieldRenderName.class);
 				String name = fieldRender.value();
-				CustomFieldRender customFieldRender = customFieldRenderFactory.getCustomFieldRender(name);
+				CustomFieldRender customFieldRender = defaultFieldRenderFactory.getCustomFieldRender(name);
 				if (customFieldRender != null) {
 					customFieldRender.render(request, response, beanMap, bean, customField);
 				}
@@ -112,8 +112,8 @@ public abstract class AbstractRender implements Render {
 		}
 	}
 
-	public void setCustomFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
-		this.customFieldRenderFactory = customFieldRenderFactory;
+	public void setDefaultFieldRenderFactory(CustomFieldRenderFactory defaultFieldRenderFactory) {
+		this.defaultFieldRenderFactory = defaultFieldRenderFactory;
 	}
 
 }

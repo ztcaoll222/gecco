@@ -12,15 +12,17 @@ public abstract class RenderFactory {
 	
 	private Map<RenderType, Render> renders;
 	
-	public RenderFactory(Reflections reflections) {
-		CustomFieldRenderFactory customFieldRenderFactory = new CustomFieldRenderFactory(reflections);
-		renders = new HashMap<RenderType, Render>();
+	public RenderFactory(Reflections reflections, CustomFieldRenderFactory customFieldRenderFactory) {
+		if (customFieldRenderFactory == null) {
+			customFieldRenderFactory = new DefaultFieldRenderFactory(reflections);
+		}
+		renders = new HashMap<>(8);
 		
 		AbstractRender htmlRender = createHtmlRender();
-		htmlRender.setCustomFieldRenderFactory(customFieldRenderFactory);
+		htmlRender.setDefaultFieldRenderFactory(customFieldRenderFactory);
 		
 		AbstractRender jsonRender = createJsonRender();
-		jsonRender.setCustomFieldRenderFactory(customFieldRenderFactory);
+		jsonRender.setDefaultFieldRenderFactory(customFieldRenderFactory);
 		
 		renders.put(RenderType.HTML, htmlRender);
 		renders.put(RenderType.JSON, jsonRender);

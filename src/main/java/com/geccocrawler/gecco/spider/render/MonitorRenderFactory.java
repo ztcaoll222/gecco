@@ -10,8 +10,8 @@ import com.geccocrawler.gecco.spider.render.json.JsonRender;
 
 public class MonitorRenderFactory extends RenderFactory {
 
-	public MonitorRenderFactory(Reflections reflections) {
-		super(reflections);
+	public MonitorRenderFactory(Reflections reflections, CustomFieldRenderFactory customFieldRenderFactory) {
+		super(reflections, customFieldRenderFactory);
 	}
 
 	@Override

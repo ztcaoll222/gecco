@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
+import com.geccocrawler.gecco.spider.render.CustomFieldRender;
+import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,6 +58,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 	private SpiderBeanFactory spiderBeanFactory;
 
 	private PipelineFactory pipelineFactory;
+
+	private CustomFieldRenderFactory customFieldRenderFactory;
 
 	private List<Spider> spiders;
 
@@ -111,16 +115,16 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 	}
 
 	public static GeccoEngine create(String classpath) {
-		return create(classpath, null);
+		return create(classpath, null, null);
 	}
 
-	public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory) {
+	public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory) {
 		if (StringUtils.isEmpty(classpath)) {
 			// classpath不为空
 			throw new IllegalArgumentException("classpath cannot be empty");
 		}
 		GeccoEngine ge = create();
-		ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory);
+		ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory);
 		return ge;
 	}
 
@@ -212,6 +216,11 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		return this;
 	}
 
+	public GeccoEngine customFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
+		this.customFieldRenderFactory = customFieldRenderFactory;
+		return this;
+	}
+
 	public GeccoEngine spiderBeanFactory(SpiderBeanFactory spiderBeanFactory) {
 		this.spiderBeanFactory = spiderBeanFactory;
 		return this;
@@ -247,7 +256,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 				// classpath不为空
 				throw new IllegalArgumentException("classpath cannot be empty");
 			}
-			spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory);
+			spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory);
 		}
 		if (threadCount <= 0) {
 			threadCount = 1;

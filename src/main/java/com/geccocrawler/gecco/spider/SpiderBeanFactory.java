@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -62,10 +63,10 @@ public class SpiderBeanFactory {
 	protected Reflections reflections;
 
 	public SpiderBeanFactory(String classPath) {
-		this(classPath, null);
+		this(classPath, null, null);
 	}
 
-	public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory) {
+	public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory) {
 		if (StringUtils.isNotEmpty(classPath)) {
 			reflections = new Reflections(
 					ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
@@ -82,7 +83,7 @@ public class SpiderBeanFactory {
 
 		this.downloaderFactory = new MonitorDownloaderFactory(reflections);
 		this.downloaderAOPFactory = new DownloaderAOPFactory(reflections);
-		this.renderFactory = new MonitorRenderFactory(reflections);
+		this.renderFactory = new MonitorRenderFactory(reflections, customFieldRenderFactory);
 		if (pipelineFactory != null) {
 			this.pipelineFactory = pipelineFactory;
 		} else {
