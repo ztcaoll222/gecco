@@ -4,17 +4,17 @@ import org.reflections.Reflections;
 
 /**
  * 下载器工厂类
- * 
- * @author huchengyi
  *
+ * @author huchengyi
  */
 public class DefaultDownloaderFactory extends DownloaderFactory {
 
-	public DefaultDownloaderFactory(Reflections reflections) {
-		super(reflections);
-	}
+    public DefaultDownloaderFactory(Reflections reflections) {
+        super(reflections);
+    }
 
-	protected Object createDownloader(Class<?> downloaderClass) throws Exception {
-		return downloaderClass.newInstance();
-	}
+    @Override
+    protected Object createDownloader(Class<?> downloaderClass) throws Exception {
+        return downloaderClass.newInstance();
+    }
 }

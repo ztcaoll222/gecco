@@ -1,25 +1,7 @@
 package com.geccocrawler.gecco;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
-
-import com.geccocrawler.gecco.spider.render.CustomFieldRender;
-import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-
 import com.alibaba.fastjson.JSON;
+import com.geccocrawler.gecco.common.GlobalThreadFactory;
 import com.geccocrawler.gecco.downloader.proxy.FileProxys;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.dynamic.DynamicGecco;
@@ -36,8 +18,25 @@ import com.geccocrawler.gecco.scheduler.Scheduler;
 import com.geccocrawler.gecco.scheduler.StartScheduler;
 import com.geccocrawler.gecco.spider.Spider;
 import com.geccocrawler.gecco.spider.SpiderBeanFactory;
+import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 爬虫引擎，每个爬虫引擎最好独立进程，在分布式爬虫场景下，可以单独分配一台爬虫服务器。引擎包括Scheduler、Downloader、Spider、 SpiderBeanFactory4个主要模块
@@ -274,8 +273,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		for (int i = 0; i < threadCount; i++) {
 			Spider spider = new Spider(this);
 			spiders.add(spider);
-			Thread thread = new Thread(spider, "T" + classpath + i);
-			thread.start();
+			GlobalThreadFactory.INSTANCE.execute(spider);
 		}
 		startTime = new Date();
 		if(monitor) {
@@ -301,7 +299,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 			URL url = Resources.getResource("starts.json");
 			File file = new File(url.getPath());
 			if (file.exists()) {
-				String json = Files.toString(file, Charset.forName("UTF-8"));
+				String json = Files.asCharSource(file, Charset.forName("UTF-8")).read();
 				List<StartRequestList> list = JSON.parseArray(json, StartRequestList.class);
 				for (StartRequestList start : list) {
 					start(start.toRequest());

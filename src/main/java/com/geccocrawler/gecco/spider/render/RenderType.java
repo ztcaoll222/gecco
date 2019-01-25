@@ -1,7 +1,18 @@
 package com.geccocrawler.gecco.spider.render;
 
 public enum RenderType {
-	
-	HTML, JSON, XML
-	
+
+    /**
+     * html格式
+     */
+    HTML,
+    /**
+     * json格式
+     */
+    JSON,
+    /**
+     * xml格式
+     */
+    XML
+
 }
