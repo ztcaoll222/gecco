@@ -41,6 +41,7 @@ import org.apache.http.util.CharArrayBuffer;
 import javax.net.ssl.SSLContext;
 import java.io.*;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -121,12 +122,8 @@ public class HttpClientDownloader extends AbstractDownloader {
                 NameValuePair nvp = new BasicNameValuePair(entry.getKey(), entry.getValue());
                 fields.add(nvp);
             }
-            try {
-                HttpEntity entity = new UrlEncodedFormEntity(fields, "UTF-8");
-                ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+            HttpEntity entity = new UrlEncodedFormEntity(fields, StandardCharsets.UTF_8);
+            ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
         } else {//get
             reqObj = new HttpGet(request.getUrl());
         }

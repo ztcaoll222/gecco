@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.geccocrawler.gecco.config.GlobalConfig;
 
 public class HttpPostRequest extends AbstractHttpRequest {
 
@@ -14,24 +15,31 @@ public class HttpPostRequest extends AbstractHttpRequest {
 	
 	public HttpPostRequest() {
 		super();
-		fields = new HashMap<String, String>();
+		fields = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
 	}
 
 	public HttpPostRequest(String url) {
 		super(url);
-		fields = new HashMap<String, String>();
+		fields = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
 	}
-	
+
+	public HttpPostRequest(String url, Map<String, String> params) {
+		super(url);
+		fields = params;
+	}
+
 	public Map<String, String> getFields() {
 		return fields;
 	}
 
-	public void setFields(Map<String, String> fields) {
+	public HttpPostRequest setFields(Map<String, String> fields) {
 		this.fields = fields;
+		return this;
 	}
 
-	public void addField(String name, String field) {
+	public HttpPostRequest addField(String name, String field) {
 		fields.put(name, field);
+		return this;
 	}
 	
 	public String getField(String name) {
@@ -39,6 +47,6 @@ public class HttpPostRequest extends AbstractHttpRequest {
 	}
 	
 	public static HttpPostRequest fromJson(JSONObject request) {
-		return (HttpPostRequest)JSON.toJavaObject(request, HttpPostRequest.class);
+		return JSON.toJavaObject(request, HttpPostRequest.class);
 	}
 }

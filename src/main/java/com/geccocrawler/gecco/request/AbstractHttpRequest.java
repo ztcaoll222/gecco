@@ -1,6 +1,7 @@
 package com.geccocrawler.gecco.request;
 
 import com.alibaba.fastjson.JSON;
+import com.geccocrawler.gecco.config.GlobalConfig;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -27,9 +28,9 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     private long priority;
 
     public AbstractHttpRequest() {
-        this.parameters = new HashMap<String, String>(1);
-        this.headers = new HashMap<String, String>(1);
-        this.cookies = new HashMap<String, String>(1);
+        this.parameters = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
+        this.headers = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
+        this.cookies = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
     }
 
     public AbstractHttpRequest(String url) {

@@ -6,6 +6,7 @@ import org.apache.http.conn.ConnectTimeoutException;
 
 import java.io.*;
 import java.net.SocketTimeoutException;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,7 +37,7 @@ public abstract class AbstractDownloader implements Downloader {
         }
         if (charset == null) {
             //默认采用utf-8
-            charset = "UTF-8";
+            charset = StandardCharsets.UTF_8.name();
         }
         return charset;
     }

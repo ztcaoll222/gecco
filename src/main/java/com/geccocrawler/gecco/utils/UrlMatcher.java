@@ -2,6 +2,7 @@ package com.geccocrawler.gecco.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -96,7 +97,7 @@ public class UrlMatcher {
 					String value = matcher2.group(i);
 					//boolean x = matcher2.requireEnd();
 					try {
-						value = URLDecoder.decode(value, "UTF-8");
+						value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
 					} catch (UnsupportedEncodingException e) {
 						e.printStackTrace();
 					}

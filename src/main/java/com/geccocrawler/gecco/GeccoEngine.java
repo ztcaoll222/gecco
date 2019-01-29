@@ -11,6 +11,7 @@ import com.geccocrawler.gecco.monitor.GeccoJmx;
 import com.geccocrawler.gecco.monitor.GeccoMonitor;
 import com.geccocrawler.gecco.pipeline.PipelineFactory;
 import com.geccocrawler.gecco.request.HttpGetRequest;
+import com.geccocrawler.gecco.request.HttpPostRequest;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.request.StartRequestList;
 import com.geccocrawler.gecco.scheduler.NoLoopStartScheduler;
@@ -31,10 +32,11 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
@@ -136,6 +138,22 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 			start(url);
 		}
 		return this;
+	}
+
+	public GeccoEngine get(String url) {
+		return start(url);
+	}
+
+	public GeccoEngine get(String... urls) {
+		return start(urls);
+	}
+
+    public GeccoEngine post(String url) {
+        return start(new HttpPostRequest(url));
+    }
+
+	public GeccoEngine post(String url, Map<String, String> params) {
+		return start(new HttpPostRequest(url, params));
 	}
 
 	public GeccoEngine start(HttpRequest request) {
@@ -299,7 +317,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 			URL url = Resources.getResource("starts.json");
 			File file = new File(url.getPath());
 			if (file.exists()) {
-				String json = Files.asCharSource(file, Charset.forName("UTF-8")).read();
+				String json = Files.asCharSource(file, StandardCharsets.UTF_8).read();
 				List<StartRequestList> list = JSON.parseArray(json, StartRequestList.class);
 				for (StartRequestList start : list) {
 					start(start.toRequest());

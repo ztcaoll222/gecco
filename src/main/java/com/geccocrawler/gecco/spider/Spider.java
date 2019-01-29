@@ -191,8 +191,7 @@ public class Spider implements Runnable {
      * @return
      */
     private HttpResponse defaultDownload(HttpRequest request) throws DownloadException {
-        HttpResponse response = download(null, request);
-        return response;
+        return download(null, request);
     }
 
     private HttpResponse download(SpiderBeanContext context, HttpRequest request) throws DownloadException {

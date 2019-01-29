@@ -15,6 +15,7 @@ import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class ImageFieldRender implements FieldRender {
             String last = StringUtils.substringAfter(imgUrl, "?");
             String fileName = StringUtils.substringAfterLast(before, "/");
             if (StringUtils.isNotEmpty(last)) {
-                last = URLEncoder.encode(last, "UTF-8");
+                last = URLEncoder.encode(last, StandardCharsets.UTF_8.name());
                 imgUrl = before + "?" + last;
             }
             HttpRequest subRequest = request.subRequest(imgUrl);
