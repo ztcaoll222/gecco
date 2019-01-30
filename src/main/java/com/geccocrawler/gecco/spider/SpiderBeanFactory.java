@@ -3,6 +3,7 @@ package com.geccocrawler.gecco.spider;
 import com.geccocrawler.gecco.annotation.Gecco;
 import com.geccocrawler.gecco.downloader.DownloaderAOPFactory;
 import com.geccocrawler.gecco.downloader.DownloaderFactory;
+import com.geccocrawler.gecco.downloader.DownloaderFactoryBuilder;
 import com.geccocrawler.gecco.downloader.MonitorDownloaderFactory;
 import com.geccocrawler.gecco.dynamic.GeccoClassLoader;
 import com.geccocrawler.gecco.dynamic.GeccoJavaReflectionAdapter;
@@ -64,22 +65,19 @@ public class SpiderBeanFactory {
         this(classPath, null, null, null);
     }
 
-    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactory downloaderFactory) {
+    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactoryBuilder downloaderFactoryBuilder) {
         if (StringUtils.isNotEmpty(classPath)) {
-            reflections = new Reflections(
-                    ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
-                            .setMetadataAdapter(new GeccoJavaReflectionAdapter())
-                            .setExpandSuperTypes(false));
-            // reflections = new Reflections("com.geccocrawler.gecco", classPath);
+            reflections = new Reflections(ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
+                    .setMetadataAdapter(new GeccoJavaReflectionAdapter())
+                    .setExpandSuperTypes(false));
         } else {
             reflections = new Reflections(ConfigurationBuilder.build("com.geccocrawler.gecco", GeccoClassLoader.get())
                     .setMetadataAdapter(new GeccoJavaReflectionAdapter())
                     .setExpandSuperTypes(false));
-            // reflections = new Reflections("com.geccocrawler.gecco");
         }
         dynamic();
 
-        this.downloaderFactory = (downloaderFactory == null ? new MonitorDownloaderFactory(reflections) : downloaderFactory);
+        this.downloaderFactory = (downloaderFactoryBuilder == null ? new MonitorDownloaderFactory(reflections) : downloaderFactoryBuilder.builder(reflections));
         this.downloaderAOPFactory = new DownloaderAOPFactory(reflections);
         this.renderFactory = new MonitorRenderFactory(reflections, customFieldRenderFactory);
         if (pipelineFactory != null) {
@@ -87,8 +85,8 @@ public class SpiderBeanFactory {
         } else {
             this.pipelineFactory = new DefaultPipelineFactory(reflections);
         }
-        this.spiderBeans = new ConcurrentHashMap<String, Class<? extends SpiderBean>>();
-        this.spiderBeanContexts = new ConcurrentHashMap<String, SpiderBeanContext>();
+        this.spiderBeans = new ConcurrentHashMap<>();
+        this.spiderBeanContexts = new ConcurrentHashMap<>();
         loadSpiderBean(reflections);
     }
 
