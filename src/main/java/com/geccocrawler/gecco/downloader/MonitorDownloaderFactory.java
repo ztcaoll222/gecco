@@ -23,8 +23,7 @@ public class MonitorDownloaderFactory extends DownloaderFactory {
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(downloaderClass);
 		enhancer.setCallback(new DownloadMointorIntercetor());
-		Object o = enhancer.create();
-		return o;
+		return enhancer.create();
 	}
 
 }

@@ -2,6 +2,7 @@ package com.geccocrawler.gecco;
 
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.common.GlobalThreadFactory;
+import com.geccocrawler.gecco.downloader.DownloaderFactory;
 import com.geccocrawler.gecco.downloader.proxy.FileProxys;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.dynamic.DynamicGecco;
@@ -60,6 +61,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
 	private PipelineFactory pipelineFactory;
 
+    private DownloaderFactory downloaderFactory;
+
 	private CustomFieldRenderFactory customFieldRenderFactory;
 
 	private List<Spider> spiders;
@@ -116,16 +119,16 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 	}
 
 	public static GeccoEngine create(String classpath) {
-		return create(classpath, null, null);
+		return create(classpath, null, null, null);
 	}
 
-	public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory) {
+	public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactory downloaderFactory) {
 		if (StringUtils.isEmpty(classpath)) {
 			// classpath不为空
 			throw new IllegalArgumentException("classpath cannot be empty");
 		}
 		GeccoEngine ge = create();
-		ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory);
+		ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactory);
 		return ge;
 	}
 
@@ -233,7 +236,12 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		return this;
 	}
 
-	public GeccoEngine customFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
+    public GeccoEngine setDownloaderFactory(DownloaderFactory downloaderFactory) {
+        this.downloaderFactory = downloaderFactory;
+        return this;
+    }
+
+    public GeccoEngine customFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
 		this.customFieldRenderFactory = customFieldRenderFactory;
 		return this;
 	}
@@ -273,7 +281,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 				// classpath不为空
 				throw new IllegalArgumentException("classpath cannot be empty");
 			}
-			spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory);
+			spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactory);
 		}
 		if (threadCount <= 0) {
 			threadCount = 1;

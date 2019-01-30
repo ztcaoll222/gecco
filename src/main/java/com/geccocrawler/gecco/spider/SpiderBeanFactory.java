@@ -61,10 +61,10 @@ public class SpiderBeanFactory {
     protected Reflections reflections;
 
     public SpiderBeanFactory(String classPath) {
-        this(classPath, null, null);
+        this(classPath, null, null, null);
     }
 
-    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory) {
+    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactory downloaderFactory) {
         if (StringUtils.isNotEmpty(classPath)) {
             reflections = new Reflections(
                     ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
@@ -79,7 +79,7 @@ public class SpiderBeanFactory {
         }
         dynamic();
 
-        this.downloaderFactory = new MonitorDownloaderFactory(reflections);
+        this.downloaderFactory = (downloaderFactory == null ? new MonitorDownloaderFactory(reflections) : downloaderFactory);
         this.downloaderAOPFactory = new DownloaderAOPFactory(reflections);
         this.renderFactory = new MonitorRenderFactory(reflections, customFieldRenderFactory);
         if (pipelineFactory != null) {
