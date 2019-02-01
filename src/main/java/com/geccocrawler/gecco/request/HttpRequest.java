@@ -35,8 +35,10 @@ public interface HttpRequest extends Cloneable {
 	public HttpRequest subRequest(String url);
 	
 	public Map<String, String> getCookies();
-	
-	public void addCookie(String name, String value);
+
+    void clearParams();
+
+    public void addCookie(String name, String value);
 	
 	public String getCookie(String name);
 	

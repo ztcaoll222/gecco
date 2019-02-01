@@ -57,6 +57,15 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
+    public void clearParams() {
+        Iterator<Map.Entry<String, String>> it = this.parameters.entrySet().iterator();
+        while (it.hasNext()) {
+            it.next();
+            it.remove();
+        }
+    }
+
+    @Override
     public void addCookie(String name, String value) {
         cookies.put(name, value);
     }

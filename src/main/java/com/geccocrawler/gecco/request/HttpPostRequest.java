@@ -1,6 +1,7 @@
 package com.geccocrawler.gecco.request;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
@@ -48,5 +49,15 @@ public class HttpPostRequest extends AbstractHttpRequest {
 	
 	public static HttpPostRequest fromJson(JSONObject request) {
 		return JSON.toJavaObject(request, HttpPostRequest.class);
+	}
+
+	@Override
+	public void clearParams() {
+		super.clearParams();
+		Iterator<Map.Entry<String, String>> it = this.fields.entrySet().iterator();
+		while (it.hasNext()) {
+			it.next();
+			it.remove();
+		}
 	}
 }
