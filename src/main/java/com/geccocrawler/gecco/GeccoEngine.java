@@ -2,6 +2,7 @@ package com.geccocrawler.gecco;
 
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.common.GlobalThreadFactory;
+import com.geccocrawler.gecco.config.GlobalConfig;
 import com.geccocrawler.gecco.downloader.DownloaderFactoryBuilder;
 import com.geccocrawler.gecco.downloader.proxy.FileProxys;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
@@ -84,6 +85,10 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 	private boolean mobile;
 
 	private boolean debug;
+
+	private boolean withStartsJson = true;
+
+	private String startsJson = GlobalConfig.DEFAULT_STARTS_JSON;
 	
 	private boolean monitor = true;
 
@@ -251,6 +256,22 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		return this;
 	}
 
+	public boolean isWithStartsJson() {
+		return withStartsJson;
+	}
+
+	public void withStartsJson(boolean withStartsJson) {
+		this.withStartsJson = withStartsJson;
+	}
+
+	public String getStartsJson() {
+		return startsJson;
+	}
+
+	public void startsJson(String startsJson) {
+		this.startsJson = startsJson;
+	}
+
 	public void register(Class<?> spiderBeanClass) {
 		getSpiderBeanFactory().addSpiderBean(spiderBeanClass);
 	}
@@ -287,7 +308,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 			threadCount = 1;
 		}
 		this.cdl = new CountDownLatch(threadCount);
-		startsJson();
+		if (withStartsJson) {
+			initStartsJson(startsJson);
+		}
 		if (startRequests.isEmpty()) {
 			// startRequests不为空
 			// throw new IllegalArgumentException("startRequests cannot be empty");
@@ -320,9 +343,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		super.start();
 	}
 
-	private GeccoEngine startsJson() {
+	private GeccoEngine initStartsJson(String filename) {
 		try {
-			URL url = Resources.getResource("starts.json");
+			URL url = Resources.getResource(filename);
 			File file = new File(url.getPath());
 			if (file.exists()) {
 				String json = Files.asCharSource(file, StandardCharsets.UTF_8).read();
