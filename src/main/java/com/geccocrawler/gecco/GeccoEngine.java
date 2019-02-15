@@ -260,16 +260,18 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 		return withStartsJson;
 	}
 
-	public void withStartsJson(boolean withStartsJson) {
+	public GeccoEngine withStartsJson(boolean withStartsJson) {
 		this.withStartsJson = withStartsJson;
+		return this;
 	}
 
 	public String getStartsJson() {
 		return startsJson;
 	}
 
-	public void startsJson(String startsJson) {
+	public GeccoEngine startsJson(String startsJson) {
 		this.startsJson = startsJson;
+		return this;
 	}
 
 	public void register(Class<?> spiderBeanClass) {
