@@ -39,10 +39,14 @@ public interface HttpRequest extends Cloneable {
     void clearParams();
 
     public void addCookie(String name, String value);
+
+    public void setCookies(Map<String, String> cookies);
 	
 	public String getCookie(String name);
 	
 	public void clearCookie();
+
+	void setHeaders(Map<String, String> headers);
 
 	public long getPriority();
 	

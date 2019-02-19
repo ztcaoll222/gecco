@@ -153,12 +153,14 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
         this.charset = charset;
     }
 
+    @Override
     public void setCookies(Map<String, String> cookies) {
-        this.cookies = cookies;
+        this.cookies.putAll(cookies);
     }
 
+    @Override
     public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
+        this.headers.putAll(headers);
     }
 
     @Override

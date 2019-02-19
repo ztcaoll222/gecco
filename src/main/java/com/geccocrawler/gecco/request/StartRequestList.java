@@ -1,5 +1,7 @@
 package com.geccocrawler.gecco.request;
 
+import com.geccocrawler.gecco.config.GlobalConfig;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,9 +18,9 @@ public class StartRequestList {
 	private Map<String, String> posts;
 	
 	public StartRequestList() {
-		cookies = new HashMap<String, String>();
-		headers = new HashMap<String, String>();
-		posts = new HashMap<String, String>();
+		cookies = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
+		headers = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
+		posts = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
 	}
 	
 	public HttpRequest toRequest() {
