@@ -1,18 +1,16 @@
 package com.geccocrawler.gecco.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
 import com.google.common.io.Files;
+import lombok.extern.apachecommons.CommonsLog;
+import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * 下载图片到指定目录
@@ -20,10 +18,8 @@ import com.google.common.io.Files;
  * @author huchengyi
  *
  */
+@CommonsLog
 public class DownloadImage {
-	
-	private static Log log = LogFactory.getLog(DownloadImage.class);
-	
 	/**
 	 * 下载图片到指定目录
 	 * 

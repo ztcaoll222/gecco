@@ -8,18 +8,15 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.FieldInfo;
 import javassist.bytecode.annotation.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 
 /**
  * 动态生成属性的注解
  *
  * @author huchengyi
  */
+@CommonsLog
 public class JavassistDynamicField implements DynamicField {
-
-    private static Log log = LogFactory.getLog(JavassistDynamicField.class);
-
     private DynamicBean dynamicBean;
 
     private CtField cfield;

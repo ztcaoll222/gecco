@@ -1,10 +1,6 @@
 package com.geccocrawler.gecco.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 @Inherited
 @Target(ElementType.TYPE)
@@ -39,4 +35,14 @@ public @interface Gecco {
 	 * @return 管道过滤器
 	 */
 	String[] pipelines() default "";
+
+	/**
+	 * 预处理
+	 */
+	String beforeDownload() default "";
+
+	/**
+	 * 后处理
+	 */
+	String afterDownload() default "";
 }

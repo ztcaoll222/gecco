@@ -15,9 +15,8 @@ import com.geccocrawler.gecco.spider.render.RenderType;
 import com.geccocrawler.gecco.utils.ReflectUtils;
 import com.geccocrawler.gecco.utils.UrlMatcher;
 import lombok.Getter;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.reflections.Reflections;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
@@ -36,10 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author huchengyi
  */
 @Getter
+@CommonsLog
 public class SpiderBeanFactory {
-
-    private static final Log LOG = LogFactory.getLog(SpiderBeanFactory.class);
-
     /**
      * 匹配的SpriderBean matchUrl:SpiderBean
      */
@@ -117,7 +114,7 @@ public class SpiderBeanFactory {
                 // SpiderBean spider = (SpiderBean)spiderBeanClass.newInstance();
                 // 判断是不是SpiderBeanClass????
                 if (spiderBeans.containsKey(matchUrl)) {
-                    LOG.warn("there are multil '" + matchUrl + "' ,first htmlBean will be Override。");
+                    log.warn("there are multil '" + matchUrl + "' ,first htmlBean will be Override。");
                 }
                 spiderBeans.put(matchUrl, (Class<? extends SpiderBean>) spiderBeanClass);
                 SpiderBeanContext context = initContext(spiderBeanClass);
@@ -181,12 +178,17 @@ public class SpiderBeanFactory {
     }
 
     private void downloadContext(SpiderBeanContext context, Class<?> spiderBeanClass) {
-        String geccoName = spiderBeanClass.getName();
-        context.setBeforeDownload(downloaderAOPFactory.getBefore(geccoName));
-        context.setAfterDownload(downloaderAOPFactory.getAfter(geccoName));
         Gecco gecco = spiderBeanClass.getAnnotation(Gecco.class);
+
+        String beforeDownloadName = gecco.beforeDownload();
+        String afterDownload = gecco.afterDownload();
+        String geccoName = spiderBeanClass.getName();
+        context.setBeforeDownload(downloaderAOPFactory.getBefore(beforeDownloadName, geccoName));
+        context.setAfterDownload(downloaderAOPFactory.getAfter(afterDownload, geccoName));
+
         String downloader = gecco.downloader();
         context.setDownloader(downloaderFactory.getDownloader(downloader));
+
         context.setTimeout(gecco.timeout());
     }
 
@@ -201,7 +203,7 @@ public class SpiderBeanFactory {
     @SuppressWarnings({"rawtypes"})
     private void pipelineContext(SpiderBeanContext context, String[] pipelineNames) {
         if (pipelineNames != null && pipelineNames.length > 0) {
-            List<Pipeline> pipelines = new ArrayList<Pipeline>();
+            List<Pipeline> pipelines = new ArrayList<>();
             for (String pipelineName : pipelineNames) {
                 if (StringUtils.isEmpty(pipelineName)) {
                     continue;

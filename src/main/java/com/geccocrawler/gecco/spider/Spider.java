@@ -8,8 +8,7 @@ import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.scheduler.Scheduler;
 import com.geccocrawler.gecco.scheduler.UniqueSpiderScheduler;
 import com.geccocrawler.gecco.spider.render.Render;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -20,10 +19,8 @@ import java.util.concurrent.CountDownLatch;
  *
  * @author huchengyi
  */
+@CommonsLog
 public class Spider implements Runnable {
-
-    private static Log log = LogFactory.getLog(Spider.class);
-
     private CountDownLatch pauseCountDown;
 
     private volatile boolean stop;
@@ -179,7 +176,7 @@ public class Spider implements Runnable {
         if (interval > 0) {
             try {
                 Thread.sleep(randomInterval(interval));
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignore) {
             }
         }
     }

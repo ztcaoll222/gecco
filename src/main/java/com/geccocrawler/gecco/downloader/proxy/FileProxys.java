@@ -3,10 +3,9 @@ package com.geccocrawler.gecco.downloader.proxy;
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 
 import java.io.File;
@@ -26,10 +25,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  *
  * @author huchengyi
  */
+@CommonsLog
 public class FileProxys implements Proxys {
-
-    private static Log log = LogFactory.getLog(FileProxys.class);
-
     private ConcurrentLinkedQueue<Proxy> proxyQueue;
 
     private Map<String, Proxy> proxys = null;

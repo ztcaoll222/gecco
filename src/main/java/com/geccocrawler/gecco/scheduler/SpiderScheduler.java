@@ -1,45 +1,40 @@
 package com.geccocrawler.gecco.scheduler;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.geccocrawler.gecco.request.HttpRequest;
+import lombok.extern.apachecommons.CommonsLog;
+
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * 线程安全的非阻塞FIFO队列
- * 
- * @author huchengyi
  *
+ * @author huchengyi
  */
 @Deprecated
+@CommonsLog
 public class SpiderScheduler implements Scheduler {
-	
-	private static Log log = LogFactory.getLog(SpiderScheduler.class);
-	
-	private ConcurrentLinkedQueue<HttpRequest> queue;
-	
-	public SpiderScheduler() {
-		queue = new ConcurrentLinkedQueue<HttpRequest>();
-	}
+    private ConcurrentLinkedQueue<HttpRequest> queue;
 
-	@Override
-	public HttpRequest out() {
-		HttpRequest request = queue.poll();
-		if(request != null) {
-			if(log.isDebugEnabled()) {
-				log.debug("OUT:"+request.getUrl()+"(Referer:"+request.getHeaders().get("Referer")+")");
-			}
-		}
-		return request;
-	}
+    public SpiderScheduler() {
+        queue = new ConcurrentLinkedQueue<HttpRequest>();
+    }
 
-	@Override
-	public void into(HttpRequest request) {
-		queue.offer(request);
-		if(log.isDebugEnabled()) {
-			log.debug("INTO:"+request.getUrl()+"(Referer:"+request.getHeaders().get("Referer")+")");
-		}
-	}
+    @Override
+    public HttpRequest out() {
+        HttpRequest request = queue.poll();
+        if (request != null) {
+            if (log.isDebugEnabled()) {
+                log.debug("OUT:" + request.getUrl() + "(Referer:" + request.getHeaders().get("Referer") + ")");
+            }
+        }
+        return request;
+    }
+
+    @Override
+    public void into(HttpRequest request) {
+        queue.offer(request);
+        if (log.isDebugEnabled()) {
+            log.debug("INTO:" + request.getUrl() + "(Referer:" + request.getHeaders().get("Referer") + ")");
+        }
+    }
 }

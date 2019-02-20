@@ -281,9 +281,7 @@ public class HtmlParser {
             String rege = "<\\s*(thead|tbody|tr|td|th)[\\s\\S]+";
             Pattern pattern = Pattern.compile(rege);
             Matcher matcher = pattern.matcher(content);
-            if (matcher.matches()) {
-                return true;
-            }
+            return matcher.matches();
         }
         return false;
     }

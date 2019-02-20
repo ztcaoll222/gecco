@@ -1,8 +1,7 @@
 package com.geccocrawler.gecco.scheduler;
 
 import com.geccocrawler.gecco.request.HttpRequest;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 
 import java.util.NavigableSet;
 import java.util.Objects;
@@ -13,10 +12,8 @@ import java.util.concurrent.ConcurrentSkipListSet;
  *
  * @author huchengyi
  */
+@CommonsLog
 public class UniqueSpiderScheduler implements Scheduler {
-
-    private static Log log = LogFactory.getLog(UniqueSpiderScheduler.class);
-
     private NavigableSet<SortHttpRequest> set;
 
     public UniqueSpiderScheduler() {

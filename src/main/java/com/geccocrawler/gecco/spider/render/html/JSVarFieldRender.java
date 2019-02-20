@@ -8,10 +8,9 @@ import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.SpiderBean;
 import com.geccocrawler.gecco.spider.conversion.Conversion;
 import com.geccocrawler.gecco.spider.render.FieldRender;
+import lombok.extern.apachecommons.CommonsLog;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.jsoup.nodes.Element;
 import org.mozilla.javascript.*;
 import org.reflections.ReflectionUtils;
@@ -26,10 +25,8 @@ import java.util.Set;
  *
  * @author huchengyi
  */
+@CommonsLog
 public class JSVarFieldRender implements FieldRender {
-
-    private static Log log = LogFactory.getLog(JSVarFieldRender.class);
-
     @Override
     @SuppressWarnings({"unchecked"})
     public void render(HttpRequest request, HttpResponse response, BeanMap beanMap, SpiderBean bean) {
@@ -83,15 +80,13 @@ public class JSVarFieldRender implements FieldRender {
             }
             // 将json对象转换为javabean属性
             try {
-                Object value = Conversion.getValue(clazz, src);
-                return value;
+                return Conversion.getValue(clazz, src);
             } catch (Exception e) {
                 log.error("field [" + field.getName() + "] conversion error, value=" + src);
             }
         } else if (jsObj instanceof Boolean || jsObj instanceof Number || jsObj instanceof String) {
             try {
-                Object value = Conversion.getValue(clazz, jsObj);
-                return value;
+                return Conversion.getValue(clazz, jsObj);
             } catch (Exception e) {
                 log.error("field [" + field.getName() + "] conversion error, value=" + jsObj);
             }

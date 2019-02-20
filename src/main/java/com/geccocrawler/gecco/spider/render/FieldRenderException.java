@@ -1,11 +1,9 @@
 package com.geccocrawler.gecco.spider.render;
 
-import java.lang.reflect.Field;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.geccocrawler.gecco.spider.SpiderThreadLocal;
+import lombok.extern.apachecommons.CommonsLog;
+
+import java.lang.reflect.Field;
 
 /**
  * 注入某个属性异常
@@ -13,10 +11,8 @@ import com.geccocrawler.gecco.spider.SpiderThreadLocal;
  * @author huchengyi
  *
  */
+@CommonsLog
 public class FieldRenderException extends Exception {
-	
-	private static Log log = LogFactory.getLog(FieldRenderException.class);
-
 	private static final long serialVersionUID = 5698150653455275921L;
 
 	private Field field;

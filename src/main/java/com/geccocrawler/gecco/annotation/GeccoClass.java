@@ -12,4 +12,6 @@ import java.lang.annotation.Target;
 public @interface GeccoClass {
 
 	Class<?>[] value();
+
+	String name() default "";
 }

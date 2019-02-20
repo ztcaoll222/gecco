@@ -1,7 +1,6 @@
 package com.geccocrawler.gecco.downloader;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.http.conn.ConnectTimeoutException;
 
 import java.io.*;
@@ -10,10 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@CommonsLog
 public abstract class AbstractDownloader implements Downloader {
-
-    private static Log log = LogFactory.getLog(AbstractDownloader.class);
-
     private static final Pattern CHARSET_PATTERN = Pattern.compile("(?i)\\bcharset=\\s*\"?([^\\s;\"]*)");
 
     private String getCharsetFromContentType(String contentType) {

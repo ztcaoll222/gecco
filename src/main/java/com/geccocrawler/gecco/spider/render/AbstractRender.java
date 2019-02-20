@@ -7,10 +7,9 @@ import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.scheduler.DeriveSchedulerContext;
 import com.geccocrawler.gecco.spider.SpiderBean;
 import com.geccocrawler.gecco.utils.ReflectUtils;
+import lombok.extern.apachecommons.CommonsLog;
 import net.sf.cglib.beans.BeanMap;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.reflections.ReflectionUtils;
 
 import java.lang.reflect.Field;
@@ -22,10 +21,8 @@ import java.util.Set;
  *
  * @author huchengyi
  */
+@CommonsLog
 public abstract class AbstractRender implements Render {
-
-    private static Log log = LogFactory.getLog(AbstractRender.class);
-
     /**
      * request请求的注入
      */

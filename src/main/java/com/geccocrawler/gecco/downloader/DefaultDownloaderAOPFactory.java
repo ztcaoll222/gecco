@@ -1,14 +1,15 @@
 package com.geccocrawler.gecco.downloader;
 
+import com.geccocrawler.gecco.annotation.GeccoClass;
+import com.geccocrawler.gecco.config.GlobalConfig;
+import lombok.extern.apachecommons.CommonsLog;
+import org.reflections.Reflections;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.geccocrawler.gecco.config.GlobalConfig;
-import org.reflections.Reflections;
-
-import com.geccocrawler.gecco.annotation.GeccoClass;
-
+@CommonsLog
 public class DefaultDownloaderAOPFactory implements DownloaderAOPFactory {
 	private Map<String, BeforeDownload> beforeDownloads;
 	
@@ -31,19 +32,21 @@ public class DefaultDownloaderAOPFactory implements DownloaderAOPFactory {
 						afterDownloads.put(name, (AfterDownload)o);
 					}
 				}
+
+
 			} catch(Exception ex) {
-				ex.printStackTrace();
+				log.error(ex.getMessage(), ex);
 			}
 		}
 	}
 
 	@Override
-	public BeforeDownload getBefore(String spiderName) {
+	public BeforeDownload getBefore(String beforeDownloadName, String spiderName) {
 		return beforeDownloads.get(spiderName);
 	}
 
 	@Override
-	public AfterDownload getAfter(String spiderName) {
+	public AfterDownload getAfter(String afterDownload, String spiderName) {
 		return afterDownloads.get(spiderName);
 	}
 

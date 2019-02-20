@@ -6,19 +6,16 @@ import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.*;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * 动态生成SpiderBean，支持类，属性和注解全部动态生成，也支持只动态生成注解
  *
  * @author huchengyi
  */
+@CommonsLog
 public class JavassistDynamicBean implements DynamicBean {
-
-    private static Log log = LogFactory.getLog(JavassistDynamicBean.class);
-
     public static final String HtmlBean = "html";
 
     public static final String JsonBean = "json";
