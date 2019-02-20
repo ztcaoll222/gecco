@@ -7,5 +7,5 @@ package com.geccocrawler.gecco.downloader;
 public interface DownloaderAOPFactory {
     BeforeDownload getBefore(String beforeDownloadName, String spiderName);
 
-    AfterDownload getAfter(String afterDownload, String spiderName);
+    AfterDownload getAfter(String afterDownloadName, String spiderName);
 }

@@ -3,7 +3,7 @@ package com.geccocrawler.gecco;
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.common.GlobalThreadFactory;
 import com.geccocrawler.gecco.config.GlobalConfig;
-import com.geccocrawler.gecco.downloader.DownloaderAOPFactory;
+import com.geccocrawler.gecco.downloader.DownloaderAOPFactoryBuilder;
 import com.geccocrawler.gecco.downloader.DownloaderFactoryBuilder;
 import com.geccocrawler.gecco.downloader.proxy.FileProxys;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
@@ -97,7 +97,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     private V ret;//callable 返回值
 
-    private DownloaderAOPFactory downloaderAOPFactory;
+    private DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder;
 
     public V getRet() {
         return ret;
@@ -126,13 +126,13 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         return create(classpath, null, null, null, null);
     }
 
-    public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactoryBuilder downloaderFactoryBuilder, DownloaderAOPFactory downloaderAOPFactory) {
+    public static GeccoEngine create(String classpath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactoryBuilder downloaderFactoryBuilder, DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder) {
         if (StringUtils.isEmpty(classpath)) {
             // classpath不为空
             throw new IllegalArgumentException("classpath cannot be empty");
         }
         GeccoEngine ge = create();
-        ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactory);
+        ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactoryBuilder);
         return ge;
     }
 
@@ -282,12 +282,12 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         DynamicGecco.unregister(spiderBeanClass);
     }
 
-    public DownloaderAOPFactory getDownloaderAOPFactory() {
-        return downloaderAOPFactory;
+    public DownloaderAOPFactoryBuilder getDownloaderAOPFactoryBuilder() {
+        return downloaderAOPFactoryBuilder;
     }
 
-    public GeccoEngine downloaderAOPFactory(DownloaderAOPFactory downloaderAOPFactory) {
-        this.downloaderAOPFactory = downloaderAOPFactory;
+    public GeccoEngine downloaderAOPFactoryBuilder(DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder) {
+        this.downloaderAOPFactoryBuilder = downloaderAOPFactoryBuilder;
         return this;
     }
 
@@ -312,7 +312,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
                 // classpath不为空
                 throw new IllegalArgumentException("classpath cannot be empty");
             }
-            spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactory);
+            spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactoryBuilder);
         }
         if (threadCount <= 0) {
             threadCount = 1;
