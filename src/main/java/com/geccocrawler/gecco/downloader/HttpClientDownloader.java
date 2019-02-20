@@ -70,12 +70,7 @@ public class HttpClientDownloader extends AbstractDownloader {
         Registry<ConnectionSocketFactory> socketFactoryRegistry = null;
         try {
             //构造一个信任所有ssl证书的httpclient
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, new TrustStrategy() {
-                @Override
-                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-                    return true;
-                }
-            }).build();
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, (chain, authType) -> true).build();
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
             socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
                     .register("http", PlainConnectionSocketFactory.getSocketFactory())
@@ -94,16 +89,13 @@ public class HttpClientDownloader extends AbstractDownloader {
         httpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(clientConfig)
                 .setConnectionManager(syncConnectionManager)
-                .setRetryHandler(new HttpRequestRetryHandler() {
-                    @Override
-                    public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
-                        int retryCount = SpiderThreadLocal.get().getEngine().getRetry();
-                        boolean retry = (executionCount <= retryCount);
-                        if (log.isDebugEnabled() && retry) {
-                            log.debug("retry : " + executionCount);
-                        }
-                        return retry;
+                .setRetryHandler((exception, executionCount, context) -> {
+                    int retryCount = SpiderThreadLocal.get().getEngine().getRetry();
+                    boolean retry = (executionCount <= retryCount);
+                    if (log.isDebugEnabled() && retry) {
+                        log.debug("retry : " + executionCount);
                     }
+                    return retry;
                 }).build();
     }
 
@@ -220,10 +212,10 @@ public class HttpClientDownloader extends AbstractDownloader {
     }
 
     public String getContent(InputStream instream, long contentLength, String charset) throws IOException {
+        if (instream == null) {
+            return null;
+        }
         try {
-            if (instream == null) {
-                return null;
-            }
             int i = (int) contentLength;
             if (i < 0) {
                 i = 4096;
@@ -243,12 +235,6 @@ public class HttpClientDownloader extends AbstractDownloader {
     }
 
     private boolean isImage(String contentType) {
-        if (contentType == null) {
-            return false;
-        }
-        if (contentType.toLowerCase().startsWith("image")) {
-            return true;
-        }
-        return false;
+        return contentType != null && contentType.toLowerCase().startsWith("image");
     }
 }

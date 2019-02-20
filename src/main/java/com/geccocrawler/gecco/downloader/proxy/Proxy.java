@@ -1,74 +1,39 @@
 package com.geccocrawler.gecco.downloader.proxy;
 
-import java.util.concurrent.atomic.AtomicLong;
-
+import lombok.Data;
 import org.apache.http.HttpHost;
 
+import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicLong;
+
+@Data
 public class Proxy {
-	
-	private HttpHost httpHost;
-	
-	private AtomicLong successCount;
-	
-	private AtomicLong failureCount;
-	
-	private String src;//来源
-	
-	public Proxy(String host, int port) {
-		this.httpHost = new HttpHost(host, port);
-		this.src = "custom";
-		this.successCount = new AtomicLong(0);
-		this.failureCount = new AtomicLong(0);
-	}
+    private static final long serialVersionUID = -5943929366628713038L;
 
-	public HttpHost getHttpHost() {
-		return httpHost;
-	}
+    private HttpHost httpHost;
 
-	public void setHttpHost(HttpHost httpHost) {
-		this.httpHost = httpHost;
-	}
+    private AtomicLong successCount;
 
-	public AtomicLong getSuccessCount() {
-		return successCount;
-	}
+    private AtomicLong failureCount;
 
-	public void setSuccessCount(AtomicLong successCount) {
-		this.successCount = successCount;
-	}
+    private String src;//来源
 
-	public AtomicLong getFailureCount() {
-		return failureCount;
-	}
+    public Proxy(String host, int port) {
+        this.httpHost = new HttpHost(host, port);
+        this.src = "custom";
+        this.successCount = new AtomicLong(0);
+        this.failureCount = new AtomicLong(0);
+    }
 
-	public void setFailureCount(AtomicLong failureCount) {
-		this.failureCount = failureCount;
-	}
-	
-	public String getIP() {
-		return this.getHttpHost().getHostName();
-	}
-	
-	public int getPort() {
-		return this.getHttpHost().getPort();
-	}
+    public String getIP() {
+        return this.getHttpHost().getHostName();
+    }
 
-	public String toHostString() {
-		return httpHost.toHostString();
-	}
+    public int getPort() {
+        return this.getHttpHost().getPort();
+    }
 
-	public String getSrc() {
-		return src;
-	}
-
-	public void setSrc(String src) {
-		this.src = src;
-	}
-
-	@Override
-	public String toString() {
-		return "Proxy [httpHost=" + httpHost + ", successCount=" + successCount
-				+ ", failureCount=" + failureCount + "]";
-	}
-	
+    public String toHostString() {
+        return httpHost.toHostString();
+    }
 }

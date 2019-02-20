@@ -1,11 +1,16 @@
 package com.geccocrawler.gecco.response;
 
+import com.google.common.io.CharStreams;
+import lombok.Data;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 
-import com.google.common.io.CharStreams;
+@Data
+public class HttpResponse implements Serializable {
+	private static final long serialVersionUID = -1808592190693059897L;
 
-public class HttpResponse {
 	private ByteArrayInputStream raw;
 
 	private String content;
@@ -21,18 +26,6 @@ public class HttpResponse {
 		response.setContent(content);
 		return response;
 	}
-
-	public ByteArrayInputStream getRaw() {
-		return raw;
-	}
-
-	public void setRaw(ByteArrayInputStream raw) {
-		this.raw = raw;
-	}
-
-	public String getContent() {
-		return content;
-	}
 	
 	public String getContent(String charset) {
 		if(charset == null) {
@@ -44,34 +37,6 @@ public class HttpResponse {
 			e.printStackTrace();
 			return content;
 		}
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
-	}
-
-	public String getCharset() {
-		return charset;
-	}
-
-	public void setCharset(String charset) {
-		this.charset = charset;
 	}
 
 	public void close() {

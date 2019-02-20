@@ -1,10 +1,7 @@
 package com.geccocrawler.gecco.spider;
 
 import com.geccocrawler.gecco.annotation.Gecco;
-import com.geccocrawler.gecco.downloader.DownloaderAOPFactory;
-import com.geccocrawler.gecco.downloader.DownloaderFactory;
-import com.geccocrawler.gecco.downloader.DownloaderFactoryBuilder;
-import com.geccocrawler.gecco.downloader.MonitorDownloaderFactory;
+import com.geccocrawler.gecco.downloader.*;
 import com.geccocrawler.gecco.dynamic.GeccoClassLoader;
 import com.geccocrawler.gecco.dynamic.GeccoJavaReflectionAdapter;
 import com.geccocrawler.gecco.pipeline.DefaultPipelineFactory;
@@ -17,6 +14,7 @@ import com.geccocrawler.gecco.spider.render.RenderFactory;
 import com.geccocrawler.gecco.spider.render.RenderType;
 import com.geccocrawler.gecco.utils.ReflectUtils;
 import com.geccocrawler.gecco.utils.UrlMatcher;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +35,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author huchengyi
  */
+@Getter
 public class SpiderBeanFactory {
 
     private static final Log LOG = LogFactory.getLog(SpiderBeanFactory.class);
@@ -62,10 +61,11 @@ public class SpiderBeanFactory {
     protected Reflections reflections;
 
     public SpiderBeanFactory(String classPath) {
-        this(classPath, null, null, null);
+        this(classPath, null, null, null, null);
     }
 
-    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory, DownloaderFactoryBuilder downloaderFactoryBuilder) {
+    public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory,
+                             DownloaderFactoryBuilder downloaderFactoryBuilder, DownloaderAOPFactory downloaderAOPFactory) {
         if (StringUtils.isNotEmpty(classPath)) {
             reflections = new Reflections(ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
                     .setMetadataAdapter(new GeccoJavaReflectionAdapter())
@@ -78,7 +78,7 @@ public class SpiderBeanFactory {
         dynamic();
 
         this.downloaderFactory = (downloaderFactoryBuilder == null ? new MonitorDownloaderFactory(reflections) : downloaderFactoryBuilder.builder(reflections));
-        this.downloaderAOPFactory = new DownloaderAOPFactory(reflections);
+        this.downloaderAOPFactory = (downloaderAOPFactory == null ? new DefaultDownloaderAOPFactory(reflections) : downloaderAOPFactory);
         this.renderFactory = new MonitorRenderFactory(reflections, customFieldRenderFactory);
         if (pipelineFactory != null) {
             this.pipelineFactory = pipelineFactory;
@@ -214,25 +214,4 @@ public class SpiderBeanFactory {
             context.setPipelines(pipelines);
         }
     }
-
-    public DownloaderAOPFactory getDownloaderAOPFactory() {
-        return downloaderAOPFactory;
-    }
-
-    public RenderFactory getRenderFactory() {
-        return renderFactory;
-    }
-
-    public PipelineFactory getPipelineFactory() {
-        return pipelineFactory;
-    }
-
-    public DownloaderFactory getDownloaderFactory() {
-        return downloaderFactory;
-    }
-
-    public Reflections getReflections() {
-        return reflections;
-    }
-
 }

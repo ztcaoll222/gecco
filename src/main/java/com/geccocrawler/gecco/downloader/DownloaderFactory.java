@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.geccocrawler.gecco.config.GlobalConfig;
 import org.reflections.Reflections;
 
 /**
@@ -19,10 +20,10 @@ public abstract class DownloaderFactory {
 	private Map<String, Downloader> downloaders;
 	
 	public DownloaderFactory(Reflections reflections) {
-		this.downloaders = new HashMap<String, Downloader>();
+		this.downloaders = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
 		Set<Class<?>> classes = reflections.getTypesAnnotatedWith(com.geccocrawler.gecco.annotation.Downloader.class);
 		for(Class<?> downloaderClass : classes) {
-			com.geccocrawler.gecco.annotation.Downloader downloader = (com.geccocrawler.gecco.annotation.Downloader)downloaderClass.getAnnotation(com.geccocrawler.gecco.annotation.Downloader.class);
+			com.geccocrawler.gecco.annotation.Downloader downloader = downloaderClass.getAnnotation(com.geccocrawler.gecco.annotation.Downloader.class);
 			try {
 				Object o = createDownloader(downloaderClass);
 				if(o instanceof Downloader) {
