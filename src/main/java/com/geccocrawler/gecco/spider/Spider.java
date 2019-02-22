@@ -107,6 +107,10 @@ public class Spider implements Runnable {
                         spiderScheduler.into(request.subRequest(response.getContent()));
                     }
                 }
+            } catch (SkipDownloadException ex) {
+                if (engine.isDebug()) {
+                    log.warn(request.getUrl() + " skip!");
+                }
             } catch (Exception ex) {
                 if (engine.isDebug()) {
                     log.error(request.getUrl() + " ERROR : ", ex);

@@ -4,6 +4,6 @@ import com.geccocrawler.gecco.request.HttpRequest;
 
 public interface BeforeDownload {
 	
-	public void process(HttpRequest request) throws BeforeDownloadException;
+	public void process(HttpRequest request) throws BeforeDownloadException, SkipDownloadException;
 
 }
