@@ -200,7 +200,7 @@ public class Spider implements Runnable {
         return download(null, request);
     }
 
-    private HttpResponse download(SpiderBeanContext context, HttpRequest request) throws DownloadException {
+    public HttpResponse download(SpiderBeanContext context, HttpRequest request) throws DownloadException {
         Downloader currDownloader = null;
         BeforeDownload before = null;
         AfterDownload after = null;
