@@ -1,5 +1,6 @@
 package com.geccocrawler.gecco.downloader;
 
+import com.geccocrawler.gecco.exception.DownloadException;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.SpiderBeanContext;

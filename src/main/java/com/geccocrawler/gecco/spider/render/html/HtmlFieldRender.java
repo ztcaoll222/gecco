@@ -6,7 +6,7 @@ import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.SpiderBean;
 import com.geccocrawler.gecco.spider.render.FieldRender;
-import com.geccocrawler.gecco.spider.render.FieldRenderException;
+import com.geccocrawler.gecco.exception.FieldRenderException;
 import com.geccocrawler.gecco.utils.ReflectUtils;
 import net.sf.cglib.beans.BeanMap;
 import org.reflections.ReflectionUtils;

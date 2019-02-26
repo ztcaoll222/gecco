@@ -2,8 +2,9 @@ package com.geccocrawler.gecco.spider.render.html;
 
 import com.geccocrawler.gecco.annotation.Ajax;
 import com.geccocrawler.gecco.config.GlobalConfig;
-import com.geccocrawler.gecco.downloader.DownloadException;
+import com.geccocrawler.gecco.exception.DownloadException;
 import com.geccocrawler.gecco.downloader.DownloaderContext;
+import com.geccocrawler.gecco.exception.FieldRenderException;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.JsonBean;

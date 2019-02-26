@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONException;
 import com.geccocrawler.gecco.annotation.JSONPath;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import com.geccocrawler.gecco.exception.FieldRenderException;
+import com.geccocrawler.gecco.exception.RenderException;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.JsonBean;

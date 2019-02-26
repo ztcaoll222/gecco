@@ -1,4 +1,4 @@
-package com.geccocrawler.gecco.downloader;
+package com.geccocrawler.gecco.exception;
 
 /**
  * @author ztcaoll222

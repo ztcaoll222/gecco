@@ -1,4 +1,4 @@
-package com.geccocrawler.gecco.spider.render;
+package com.geccocrawler.gecco.exception;
 
 import com.geccocrawler.gecco.spider.SpiderBean;
 import com.geccocrawler.gecco.spider.SpiderThreadLocal;

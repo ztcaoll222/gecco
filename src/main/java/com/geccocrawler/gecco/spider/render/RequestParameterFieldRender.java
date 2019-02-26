@@ -2,6 +2,7 @@ package com.geccocrawler.gecco.spider.render;
 
 import com.geccocrawler.gecco.annotation.RequestParameter;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import com.geccocrawler.gecco.exception.FieldRenderException;
 import com.geccocrawler.gecco.request.HttpPostRequest;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;

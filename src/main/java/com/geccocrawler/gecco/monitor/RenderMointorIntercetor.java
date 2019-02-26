@@ -1,6 +1,6 @@
 package com.geccocrawler.gecco.monitor;
 
-import com.geccocrawler.gecco.spider.render.RenderException;
+import com.geccocrawler.gecco.exception.RenderException;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 

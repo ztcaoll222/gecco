@@ -1,7 +1,7 @@
 package com.geccocrawler.gecco.monitor;
 
-import com.geccocrawler.gecco.downloader.DownloadException;
-import com.geccocrawler.gecco.downloader.DownloadServerException;
+import com.geccocrawler.gecco.exception.DownloadException;
+import com.geccocrawler.gecco.exception.DownloadServerException;
 import com.geccocrawler.gecco.request.HttpRequest;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
