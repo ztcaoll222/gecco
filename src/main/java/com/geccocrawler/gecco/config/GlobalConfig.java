@@ -29,4 +29,19 @@ public class GlobalConfig {
      * 包名
      */
     public static final String PACKAGE_NAME = "com.geccocrawler.gecco";
+
+    /**
+     * pc端的默认ua
+     */
+    public static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36";
+
+    /**
+     * 手机端的默认ua
+     */
+    public static final String DEFAULT_MOBILE_USER_AGENT = "Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A403 Safari/8536.25";
+
+    /**
+     * 默认的线程数量
+     */
+    public static final int DEFAULT_THREAD_COUNT = 1;
 }

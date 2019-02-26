@@ -29,7 +29,11 @@ public abstract class AbstractDownloaderFactory {
                     downloaders.put(name, downloaderInstance);
                 }
             } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
+                if (log.isDebugEnabled()) {
+                    log.error(ex.getMessage(), ex);
+                } else {
+                    log.error(ex.getMessage());
+                }
             }
         });
     }

@@ -53,22 +53,16 @@ public class UrlMatcher {
 
     public static Map<String, String> match(String url, String regex) {
         String regexSrc = StringUtils.replace(regex, "?", "\\?");
-        //regexSrc = StringUtils.replace(regexSrc, "/", "\\/");
         String regex1 = "\\{(.*?)\\}";
         StringBuffer sb = new StringBuffer();
         Pattern pattern = Pattern.compile(regex1);
         Matcher matcher = pattern.matcher(regexSrc);
-        List<String> names = new ArrayList<String>();
-		/*while(matcher.find()) {
-			matcher.appendReplacement(sb, "([^/]*)");
-			//matcher.appendReplacement(sb, "(.*)");
-			String name = matcher.group(1);
-			names.add(name);
-		}*/
+        List<String> names = new ArrayList<>();
         //每一个匹配都是键值对key:value或者只有key
         while (matcher.find()) {
             String name = matcher.group(1);
-            String[] splits = name.split("\\s*:\\s*");//使用:分割,只能分成两个组
+            //使用:分割,只能分成两个组
+            String[] splits = name.split("\\s*:\\s*");
             names.add(splits[0]);
             //如果有自定义的正则表达式规则，使用自定义的正则表达式规则。类似Jersey的@Path语法
             String regex2 = "([^/]*)";
@@ -90,7 +84,6 @@ public class UrlMatcher {
                 Map<String, String> params = new HashMap<String, String>(names.size());
                 for (int i = 1; i <= matcher2.groupCount(); i++) {
                     String value = matcher2.group(i);
-                    //boolean x = matcher2.requireEnd();
                     try {
                         value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException e) {

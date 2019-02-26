@@ -20,6 +20,8 @@ import com.geccocrawler.gecco.request.StartRequestList;
 import com.geccocrawler.gecco.scheduler.NoLoopStartScheduler;
 import com.geccocrawler.gecco.scheduler.Scheduler;
 import com.geccocrawler.gecco.scheduler.StartScheduler;
+import com.geccocrawler.gecco.spider.AbstractSpiderFactory;
+import com.geccocrawler.gecco.spider.DefaultSpiderFactory;
 import com.geccocrawler.gecco.spider.Spider;
 import com.geccocrawler.gecco.spider.SpiderBeanFactory;
 import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
@@ -51,7 +53,7 @@ import java.util.concurrent.CountDownLatch;
 public class GeccoEngine<V> extends Thread implements Callable<V> {
     private Date startTime;
 
-    private List<HttpRequest> startRequests = new ArrayList<HttpRequest>();
+    private List<HttpRequest> startRequests = new ArrayList<>();
 
     private Scheduler scheduler;
 
@@ -63,11 +65,11 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     private CustomFieldRenderFactory customFieldRenderFactory;
 
-    private List<Spider> spiders;
+    private AbstractSpiderFactory spiderFactory;
 
     private String classpath;
 
-    private int threadCount;
+    private int threadCount = GlobalConfig.DEFAULT_THREAD_COUNT;
 
     private CountDownLatch cdl;
 
@@ -181,7 +183,11 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
     }
 
     public GeccoEngine thread(int count) {
-        this.threadCount = count;
+        if (count <= 0) {
+            log.error("thread count must above than 0!");
+        } else {
+            this.threadCount = count;
+        }
         return this;
     }
 
@@ -291,16 +297,27 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         return this;
     }
 
+    public AbstractSpiderFactory getSpiderFactory() {
+        return spiderFactory;
+    }
+
+    public GeccoEngine spiderFactory(AbstractSpiderFactory spiderFactory) {
+        this.spiderFactory = spiderFactory;
+        return this;
+    }
+
     @Override
     public void run() {
         if (debug) {
             Logger log = LogManager.getLogger("com.geccocrawler.gecco.spider.render");
             log.setLevel(Level.DEBUG);
         }
+
         if (proxysLoader == null) {
             //默认采用proxys文件代理集合
             proxysLoader = new FileProxys();
         }
+
         if (scheduler == null) {
             if (loop) {
                 scheduler = new StartScheduler();
@@ -308,6 +325,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
                 scheduler = new NoLoopStartScheduler();
             }
         }
+
         if (spiderBeanFactory == null) {
             if (StringUtils.isEmpty(classpath)) {
                 // classpath不为空
@@ -315,6 +333,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             }
             spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactoryBuilder);
         }
+
         if (threadCount <= 0) {
             threadCount = 1;
         }
@@ -322,6 +341,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         if (withStartsJson) {
             initStartsJson(startsJson);
         }
+
         if (startRequests.isEmpty()) {
             // startRequests不为空
             // throw new IllegalArgumentException("startRequests cannot be empty");
@@ -329,12 +349,11 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         for (HttpRequest startRequest : startRequests) {
             scheduler.into(startRequest);
         }
-        spiders = new ArrayList<>(threadCount);
-        for (int i = 0; i < threadCount; i++) {
-            Spider spider = new Spider(this);
-            spiders.add(spider);
-            GlobalThreadFactory.INSTANCE.execute(spider);
+
+        if (spiderFactory == null) {
+            spiderFactory = new DefaultSpiderFactory(threadCount, this);
         }
+        spiderFactory.getSpiders().forEach(GlobalThreadFactory.INSTANCE::execute);
         startTime = new Date();
         if (monitor) {
             // 监控爬虫基本信息
@@ -394,7 +413,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
     }
 
     public List<Spider> getSpiders() {
-        return spiders;
+        return spiderFactory.getSpiders();
     }
 
     public int getRetry() {
@@ -472,10 +491,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
      * 暂停
      */
     public void pause() {
-        if (spiders != null) {
-            for (Spider spider : spiders) {
-                spider.pause();
-            }
+        if (spiderFactory != null) {
+            spiderFactory.getSpiders().forEach(Spider::pause);
         }
         if (eventListener != null) {
             eventListener.onPause(this);
@@ -486,10 +503,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
      * 重新开始抓取
      */
     public void restart() {
-        if (spiders != null) {
-            for (Spider spider : spiders) {
-                spider.restart();
-            }
+        if (spiderFactory != null) {
+            spiderFactory.getSpiders().forEach(Spider::restart);
         }
         if (eventListener != null) {
             eventListener.onRestart(this);
@@ -514,10 +529,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
     }
 
     public void engineStop() {
-        if (spiders != null) {
-            for (Spider spider : spiders) {
-                spider.stop();
-            }
+        if (spiderFactory != null) {
+            spiderFactory.getSpiders().forEach(Spider::stop);
         }
         if (eventListener != null) {
             eventListener.onStop(this);

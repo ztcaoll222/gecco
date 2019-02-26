@@ -1,7 +1,12 @@
 package com.geccocrawler.gecco.spider;
 
 import com.geccocrawler.gecco.GeccoEngine;
-import com.geccocrawler.gecco.downloader.*;
+import com.geccocrawler.gecco.downloader.AfterDownload;
+import com.geccocrawler.gecco.downloader.BeforeDownload;
+import com.geccocrawler.gecco.downloader.Downloader;
+import com.geccocrawler.gecco.exception.DownloadException;
+import com.geccocrawler.gecco.exception.DownloadTimeoutException;
+import com.geccocrawler.gecco.exception.SkipDownloadException;
 import com.geccocrawler.gecco.pipeline.Pipeline;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;

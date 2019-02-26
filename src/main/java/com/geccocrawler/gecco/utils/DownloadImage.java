@@ -14,74 +14,73 @@ import java.net.URL;
 
 /**
  * 下载图片到指定目录
- * 
- * @author huchengyi
  *
+ * @author huchengyi
  */
 @CommonsLog
 public class DownloadImage {
-	/**
-	 * 下载图片到指定目录
-	 * 
-	 * @param parentPath 指定目录
-	 * @param imgUrl 图片地址
-	 * @return 下载文件地址
-	 */
-	public static String download(String parentPath, String imgUrl) {
-		if(Strings.isNullOrEmpty(imgUrl) || Strings.isNullOrEmpty(parentPath)) {
-			return null;
-		}
-		if(imgUrl.length() > 500) {
-			return null;
-		}
-		Closer closer = Closer.create();
-		try {
-			File imageDir = new File(parentPath);
-			if(!imageDir.exists()) {
-				imageDir.mkdirs();
-			}
-			String fileName =  StringUtils.substringBefore(imgUrl, "?");
-			fileName = StringUtils.substringAfterLast(fileName, "/");
-			File imageFile = new File(imageDir, fileName);
-			InputStream in = closer.register(new URL(imgUrl).openStream());
-			Files.write(ByteStreams.toByteArray(in), imageFile);
-			return imageFile.getAbsolutePath();
-		} catch(Exception ex) {
-			ex.printStackTrace();
-			log.error("image download error :"+imgUrl);
-			return null;
-		} finally {
-			try {
-				closer.close();
-			} catch (IOException e) {
-				closer = null;
-			}
-		}
-	}
-	
-	public static String download(String parentPath, String fileName, InputStream in) {
-		Closer closer = Closer.create();
-		try {
-			File imageDir = new File(parentPath);
-			if(!imageDir.exists()) {
-				imageDir.mkdirs();
-			}
-			File imageFile = new File(imageDir, fileName);
-			Files.write(ByteStreams.toByteArray(in), imageFile);
-			return imageFile.getAbsolutePath();
-		} catch(Exception ex) {
-			ex.printStackTrace();
-			return null;
-		} finally {
-			try {
-				closer.close();
-			} catch (IOException e) {
-				closer = null;
-			}
-		}
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(DownloadImage.download("d:\\", "http://git.oschina.net/uploads/78/666978_xtuhcy.jpg?1459474621"));
-	}
+    /**
+     * 下载图片到指定目录
+     *
+     * @param parentPath 指定目录
+     * @param imgUrl     图片地址
+     * @return 下载文件地址
+     */
+    public static String download(String parentPath, String imgUrl) {
+        if (Strings.isNullOrEmpty(imgUrl) || Strings.isNullOrEmpty(parentPath)) {
+            return null;
+        }
+        if (imgUrl.length() > 500) {
+            return null;
+        }
+        Closer closer = Closer.create();
+        try {
+            File imageDir = new File(parentPath);
+            if (!imageDir.exists()) {
+                imageDir.mkdirs();
+            }
+            String fileName = StringUtils.substringBefore(imgUrl, "?");
+            fileName = StringUtils.substringAfterLast(fileName, "/");
+            File imageFile = new File(imageDir, fileName);
+            InputStream in = closer.register(new URL(imgUrl).openStream());
+            Files.write(ByteStreams.toByteArray(in), imageFile);
+            return imageFile.getAbsolutePath();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            log.error("image download error :" + imgUrl);
+            return null;
+        } finally {
+            try {
+                closer.close();
+            } catch (IOException e) {
+                closer = null;
+            }
+        }
+    }
+
+    public static String download(String parentPath, String fileName, InputStream in) {
+        Closer closer = Closer.create();
+        try {
+            File imageDir = new File(parentPath);
+            if (!imageDir.exists()) {
+                imageDir.mkdirs();
+            }
+            File imageFile = new File(imageDir, fileName);
+            Files.write(ByteStreams.toByteArray(in), imageFile);
+            return imageFile.getAbsolutePath();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        } finally {
+            try {
+                closer.close();
+            } catch (IOException e) {
+                closer = null;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        log.info(DownloadImage.download("d:\\", "http://git.oschina.net/uploads/78/666978_xtuhcy.jpg?1459474621"));
+    }
 }
