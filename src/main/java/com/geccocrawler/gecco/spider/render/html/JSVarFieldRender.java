@@ -41,7 +41,11 @@ public class JSVarFieldRender implements FieldRender {
                 try {
                     cx.evaluateString(scope, sc, "", 1, null);
                 } catch (Exception ex) {
-                    // ex.printStackTrace();
+                    if (log.isDebugEnabled()) {
+                        log.error(ex.getMessage(), ex);
+                    } else {
+                        log.error(ex.getMessage());
+                    }
                 }
             }
         }

@@ -7,7 +7,7 @@ import org.reflections.Reflections;
  *
  * @author huchengyi
  */
-public class DefaultDownloaderFactory extends DownloaderFactory {
+public class DefaultDownloaderFactory extends AbstractDownloaderFactory {
 
     public DefaultDownloaderFactory(Reflections reflections) {
         super(reflections);

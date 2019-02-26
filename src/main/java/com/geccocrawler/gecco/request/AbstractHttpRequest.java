@@ -2,6 +2,7 @@ package com.geccocrawler.gecco.request;
 
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@CommonsLog
 public abstract class AbstractHttpRequest implements HttpRequest, Comparable<HttpRequest>, Serializable {
 
     private static final long serialVersionUID = -7284636094595149962L;
@@ -98,7 +100,11 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
             request.refer(this.getUrl());
             return request;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (log.isDebugEnabled()) {
+                log.error(ex.getMessage(), ex);
+            } else {
+                log.error(ex.getMessage());
+            }
         }
         return null;
     }
@@ -188,15 +194,16 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
      */
     @Override
     public int compareTo(HttpRequest o) {
-        return this.priority > o.getPriority() ? 1 : this.priority < o.getPriority() ? -1 : 0;
+        return Long.compare(this.priority, o.getPriority());
     }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
         //通过json的序列号和反序列化实现对象的深度clone
-        String text = JSON.toJSONString(this); //序列化
-        HttpRequest request = JSON.parseObject(text, this.getClass()); //反序列化
-        return request;
+        //序列化
+        String text = JSON.toJSONString(this);
+        //反序列化
+        return JSON.parseObject(text, this.getClass());
     }
 
     @Override

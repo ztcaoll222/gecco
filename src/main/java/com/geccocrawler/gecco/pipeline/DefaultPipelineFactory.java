@@ -1,35 +1,40 @@
 package com.geccocrawler.gecco.pipeline;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
+import com.geccocrawler.gecco.annotation.PipelineName;
+import com.geccocrawler.gecco.config.GlobalConfig;
+import com.geccocrawler.gecco.spider.SpiderBean;
+import lombok.extern.apachecommons.CommonsLog;
 import org.reflections.Reflections;
 
-import com.geccocrawler.gecco.annotation.PipelineName;
-import com.geccocrawler.gecco.spider.SpiderBean;
+import java.util.HashMap;
+import java.util.Map;
 
+@CommonsLog
 public class DefaultPipelineFactory implements PipelineFactory {
 
-	private Map<String, Pipeline<? extends SpiderBean>> pipelines;
+    private Map<String, Pipeline<? extends SpiderBean>> pipelines;
 
-	@SuppressWarnings({ "unchecked" })
-	public DefaultPipelineFactory(Reflections reflections) {
-		this.pipelines = new HashMap<String, Pipeline<? extends SpiderBean>>();
-		Set<Class<?>> pipelineClasses = reflections.getTypesAnnotatedWith(PipelineName.class);
-		for (Class<?> pipelineClass : pipelineClasses) {
-			PipelineName spiderFilter = pipelineClass.getAnnotation(PipelineName.class);
-			try {
-				pipelines.put(spiderFilter.value(), (Pipeline<? extends SpiderBean>) pipelineClass.newInstance());
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
+    @SuppressWarnings({"unchecked"})
+    public DefaultPipelineFactory(Reflections reflections) {
+        this.pipelines = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
 
-	@Override
-	public Pipeline<? extends SpiderBean> getPipeline(String name) {
-		return pipelines.get(name);
-	}
+        reflections.getTypesAnnotatedWith(PipelineName.class).forEach(pipelineClass -> {
+            PipelineName spiderFilter = pipelineClass.getAnnotation(PipelineName.class);
+            try {
+                pipelines.put(spiderFilter.value(), (Pipeline<? extends SpiderBean>) pipelineClass.newInstance());
+            } catch (Exception ex) {
+                if (log.isDebugEnabled()) {
+                    log.error(ex.getMessage(), ex);
+                } else {
+                    log.error(ex.getMessage());
+                }
+            }
+        });
+    }
+
+    @Override
+    public Pipeline<? extends SpiderBean> getPipeline(String name) {
+        return pipelines.get(name);
+    }
 
 }

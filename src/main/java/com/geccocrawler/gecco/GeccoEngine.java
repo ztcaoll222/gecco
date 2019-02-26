@@ -297,7 +297,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             Logger log = LogManager.getLogger("com.geccocrawler.gecco.spider.render");
             log.setLevel(Level.DEBUG);
         }
-        if (proxysLoader == null) {//默认采用proxys文件代理集合
+        if (proxysLoader == null) {
+            //默认采用proxys文件代理集合
             proxysLoader = new FileProxys();
         }
         if (scheduler == null) {

@@ -9,5 +9,5 @@ import org.reflections.Reflections;
  * Create time: 2019/1/30 14:25
  */
 public interface DownloaderFactoryBuilder {
-    DownloaderFactory builder(Reflections reflections);
+    AbstractDownloaderFactory build(Reflections reflections);
 }

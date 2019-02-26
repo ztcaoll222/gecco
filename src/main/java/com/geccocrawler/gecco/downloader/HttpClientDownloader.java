@@ -1,5 +1,6 @@
 package com.geccocrawler.gecco.downloader;
 
+import com.geccocrawler.gecco.config.GlobalConfig;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.downloader.proxy.ProxysContext;
 import com.geccocrawler.gecco.request.HttpPostRequest;
@@ -8,10 +9,7 @@ import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.SpiderThreadLocal;
 import com.geccocrawler.gecco.utils.UrlUtils;
 import lombok.extern.apachecommons.CommonsLog;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.NameValuePair;
+import org.apache.http.*;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -37,17 +35,16 @@ import org.apache.http.util.CharArrayBuffer;
 import javax.net.ssl.SSLContext;
 import java.io.*;
 import java.net.SocketTimeoutException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 利用httpclient下载
  *
  * @author huchengyi
  */
-@com.geccocrawler.gecco.annotation.Downloader("httpClientDownloader")
+@com.geccocrawler.gecco.annotation.Downloader(GlobalConfig.DEFAULT_DOWNLOADER)
 @CommonsLog
 public class HttpClientDownloader extends AbstractDownloader {
     private CloseableHttpClient httpClient;
@@ -78,6 +75,7 @@ public class HttpClientDownloader extends AbstractDownloader {
         PoolingHttpClientConnectionManager syncConnectionManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
         syncConnectionManager.setMaxTotal(1000);
         syncConnectionManager.setDefaultMaxPerRoute(50);
+
         httpClient = HttpClientBuilder.create()
                 .setDefaultRequestConfig(clientConfig)
                 .setConnectionManager(syncConnectionManager)
@@ -96,33 +94,42 @@ public class HttpClientDownloader extends AbstractDownloader {
         if (log.isDebugEnabled()) {
             log.debug("downloading..." + request.getUrl());
         }
+
         HttpRequestBase reqObj = null;
-        if (request instanceof HttpPostRequest) {//post
+
+        if (request instanceof HttpPostRequest) {
+            //post
             HttpPostRequest post = (HttpPostRequest) request;
             reqObj = new HttpPost(post.getUrl());
             //post fields
-            List<NameValuePair> fields = new ArrayList<NameValuePair>();
-            for (Map.Entry<String, String> entry : post.getFields().entrySet()) {
-                NameValuePair nvp = new BasicNameValuePair(entry.getKey(), entry.getValue());
-                fields.add(nvp);
-            }
-            HttpEntity entity = new UrlEncodedFormEntity(fields, StandardCharsets.UTF_8);
+            List<NameValuePair> fields = post.getFields().entrySet()
+                    .stream()
+                    .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
+                    .collect(Collectors.toList());
+            HttpEntity entity = new UrlEncodedFormEntity(fields, GlobalConfig.DEFAULT_CHARSET);
             ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
-        } else {//get
+        } else {
+            //get
             reqObj = new HttpGet(request.getUrl());
         }
+
         //header
         boolean isMobile = SpiderThreadLocal.get().getEngine().isMobile();
         reqObj.addHeader("User-Agent", UserAgent.getUserAgent(isMobile));
         for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
             reqObj.setHeader(entry.getKey(), entry.getValue());
         }
+
         //request config
         RequestConfig.Builder builder = RequestConfig.custom()
-                .setConnectionRequestTimeout(1000)//从连接池获取连接的超时时间
-                .setSocketTimeout(timeout)//获取内容的超时时间
-                .setConnectTimeout(timeout)//建立socket连接的超时时间
+                //从连接池获取连接的超时时间
+                .setConnectionRequestTimeout(1000)
+                //获取内容的超时时间
+                .setSocketTimeout(timeout)
+                //建立socket连接的超时时间
+                .setConnectTimeout(timeout)
                 .setRedirectsEnabled(false);
+
         //proxy
         HttpHost proxy = null;
         Proxys proxys = ProxysContext.get();
@@ -132,10 +139,13 @@ public class HttpClientDownloader extends AbstractDownloader {
             if (proxy != null) {
                 log.debug("proxy:" + proxy.getHostName() + ":" + proxy.getPort());
                 builder.setProxy(proxy);
-                builder.setConnectTimeout(1000);//如果走代理，连接超时时间固定为1s
+                //如果走代理，连接超时时间固定为1s
+                builder.setConnectTimeout(1000);
             }
         }
+
         reqObj.setConfig(builder.build());
+
         //request and response
         try {
             for (Map.Entry<String, String> entry : request.getCookies().entrySet()) {
@@ -144,14 +154,16 @@ public class HttpClientDownloader extends AbstractDownloader {
                 cookie.setDomain(reqObj.getURI().getHost());
                 cookieContext.getCookieStore().addCookie(cookie);
             }
+
             org.apache.http.HttpResponse response = httpClient.execute(reqObj, cookieContext);
+
             int status = response.getStatusLine().getStatusCode();
             HttpResponse resp = new HttpResponse();
             resp.setStatus(status);
-            if (status == 302 || status == 301) {
+            if (status == HttpStatus.SC_MOVED_TEMPORARILY || status == HttpStatus.SC_SEE_OTHER) {
                 String redirectUrl = response.getFirstHeader("Location").getValue();
                 resp.setContent(UrlUtils.relative2Absolute(request.getUrl(), redirectUrl));
-            } else if (status == 200) {
+            } else if (status == HttpStatus.SC_OK) {
                 HttpEntity responseEntity = response.getEntity();
                 ByteArrayInputStream raw = toByteInputStream(responseEntity.getContent());
                 resp.setRaw(raw);
@@ -164,7 +176,6 @@ public class HttpClientDownloader extends AbstractDownloader {
                 if (!isImage(contentType)) {
                     String charset = request.isForceUseCharset() ? request.getCharset() : getCharset(request.getCharset(), contentType);
                     resp.setCharset(charset);
-                    //String content = EntityUtils.toString(responseEntity, charset);
                     String content = getContent(raw, responseEntity.getContentLength(), charset);
                     resp.setContent(content);
                 }
@@ -175,6 +186,7 @@ public class HttpClientDownloader extends AbstractDownloader {
                 }
                 throw new DownloadServerException(" " + status);
             }
+
             if (proxy != null) {
                 proxys.success(proxy.getHostName(), proxy.getPort());
             }

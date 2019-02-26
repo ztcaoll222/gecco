@@ -1,6 +1,7 @@
 package com.geccocrawler.gecco.spider;
 
 import com.geccocrawler.gecco.annotation.Gecco;
+import com.geccocrawler.gecco.config.GlobalConfig;
 import com.geccocrawler.gecco.downloader.*;
 import com.geccocrawler.gecco.dynamic.GeccoClassLoader;
 import com.geccocrawler.gecco.dynamic.GeccoJavaReflectionAdapter;
@@ -22,9 +23,9 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -47,7 +48,7 @@ public class SpiderBeanFactory {
      */
     private Map<String, SpiderBeanContext> spiderBeanContexts;
 
-    private DownloaderFactory downloaderFactory;
+    private AbstractDownloaderFactory downloaderFactory;
 
     private DownloaderAOPFactory downloaderAOPFactory;
 
@@ -64,17 +65,18 @@ public class SpiderBeanFactory {
     public SpiderBeanFactory(String classPath, PipelineFactory pipelineFactory, CustomFieldRenderFactory customFieldRenderFactory,
                              DownloaderFactoryBuilder downloaderFactoryBuilder, DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder) {
         if (StringUtils.isNotEmpty(classPath)) {
-            reflections = new Reflections(ConfigurationBuilder.build("com.geccocrawler.gecco", classPath, GeccoClassLoader.get())
+            reflections = new Reflections(ConfigurationBuilder.build(GlobalConfig.PACKAGE_NAME, classPath, GeccoClassLoader.get())
                     .setMetadataAdapter(new GeccoJavaReflectionAdapter())
                     .setExpandSuperTypes(false));
         } else {
-            reflections = new Reflections(ConfigurationBuilder.build("com.geccocrawler.gecco", GeccoClassLoader.get())
+            reflections = new Reflections(ConfigurationBuilder.build(GlobalConfig.PACKAGE_NAME, GeccoClassLoader.get())
                     .setMetadataAdapter(new GeccoJavaReflectionAdapter())
                     .setExpandSuperTypes(false));
         }
+
         dynamic();
 
-        this.downloaderFactory = (downloaderFactoryBuilder == null ? new MonitorDownloaderFactory(reflections) : downloaderFactoryBuilder.builder(reflections));
+        this.downloaderFactory = (downloaderFactoryBuilder == null ? new MonitorDownloaderFactory(reflections) : downloaderFactoryBuilder.build(reflections));
         this.downloaderAOPFactory = (downloaderAOPFactoryBuilder == null ? new DefaultDownloaderAOPFactory(reflections) : downloaderAOPFactoryBuilder.build(reflections));
         this.renderFactory = new MonitorRenderFactory(reflections, customFieldRenderFactory);
         if (pipelineFactory != null) {
@@ -84,6 +86,7 @@ public class SpiderBeanFactory {
         }
         this.spiderBeans = new ConcurrentHashMap<>();
         this.spiderBeanContexts = new ConcurrentHashMap<>();
+
         loadSpiderBean(reflections);
     }
 
@@ -91,28 +94,21 @@ public class SpiderBeanFactory {
      * 动态增加的spiderBean
      */
     private void dynamic() {
-        GeccoClassLoader gcl = GeccoClassLoader.get();
-        for (String className : gcl.getClasses().keySet()) {
-            reflections.getStore().get(TypeAnnotationsScanner.class.getSimpleName()).put(Gecco.class.getName(),
-                    className);
-        }
+        GeccoClassLoader.get().getClasses().keySet()
+                .forEach(className -> reflections.getStore()
+                        .get(TypeAnnotationsScanner.class.getSimpleName())
+                        .put(Gecco.class.getName(), className));
     }
 
     private void loadSpiderBean(Reflections reflections) {
-        Set<Class<?>> spiderBeanClasses = reflections.getTypesAnnotatedWith(Gecco.class);
-        for (Class<?> spiderBeanClass : spiderBeanClasses) {
-            addSpiderBean(spiderBeanClass);
-        }
+        reflections.getTypesAnnotatedWith(Gecco.class).forEach(this::addSpiderBean);
     }
 
     @SuppressWarnings({"unchecked"})
     public void addSpiderBean(Class<?> spiderBeanClass) {
         Gecco gecco = spiderBeanClass.getAnnotation(Gecco.class);
-        for (String matchUrl : gecco.matchUrl()) {
-            //String matchUrl = gecco.matchUrl();
+        Arrays.stream(gecco.matchUrl()).forEach(matchUrl -> {
             try {
-                // SpiderBean spider = (SpiderBean)spiderBeanClass.newInstance();
-                // 判断是不是SpiderBeanClass????
                 if (spiderBeans.containsKey(matchUrl)) {
                     log.warn("there are multil '" + matchUrl + "' ,first htmlBean will be Override。");
                 }
@@ -120,27 +116,35 @@ public class SpiderBeanFactory {
                 SpiderBeanContext context = initContext(spiderBeanClass);
                 spiderBeanContexts.put(spiderBeanClass.getName(), context);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                if (log.isDebugEnabled()) {
+                    log.error(ex.getMessage(), ex);
+                } else {
+                    log.error(ex.getMessage());
+                }
             }
-        }
+        });
     }
 
     public void removeSpiderBean(Class<?> spiderBeanClass) {
         Gecco gecco = spiderBeanClass.getAnnotation(Gecco.class);
-        for (String matchUrl : gecco.matchUrl()) {
-            //String matchUrl = gecco.matchUrl();
+        Arrays.stream(gecco.matchUrl()).forEach(matchUrl -> {
             try {
                 spiderBeans.remove(matchUrl);
                 spiderBeanContexts.remove(spiderBeanClass.getName());
             } catch (Exception ex) {
-                ex.printStackTrace();
+                if (log.isDebugEnabled()) {
+                    log.error(ex.getMessage(), ex);
+                } else {
+                    log.error(ex.getMessage());
+                }
             }
-        }
+        });
     }
 
     public Class<? extends SpiderBean> matchSpider(HttpRequest request) {
         String url = request.getUrl();
-        Class<? extends SpiderBean> commonSpider = null;// 通用爬虫
+        // 通用爬虫
+        Class<? extends SpiderBean> commonSpider = null;
         for (Map.Entry<String, Class<? extends SpiderBean>> entrys : spiderBeans.entrySet()) {
             Class<? extends SpiderBean> spider = entrys.getValue();
             String urlPattern = entrys.getKey();
@@ -154,7 +158,8 @@ public class SpiderBeanFactory {
                 }
             }
         }
-        if (commonSpider != null) {// 如果包含通用爬虫，返回通用爬虫
+        if (commonSpider != null) {
+            // 如果包含通用爬虫，返回通用爬虫
             return commonSpider;
         }
         return null;

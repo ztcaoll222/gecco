@@ -1,29 +1,26 @@
 package com.geccocrawler.gecco.downloader;
 
-import net.sf.cglib.proxy.Enhancer;
-
-import org.reflections.Reflections;
-
 import com.geccocrawler.gecco.monitor.DownloadMointorIntercetor;
+import net.sf.cglib.proxy.Enhancer;
+import org.reflections.Reflections;
 
 /**
  * 带监控的下载器工厂类
- * 
- * @author huchengyi
  *
+ * @author huchengyi
  */
-public class MonitorDownloaderFactory extends DownloaderFactory {
-	
-	public MonitorDownloaderFactory(Reflections reflections) {
-		super(reflections);
-	}
+public class MonitorDownloaderFactory extends AbstractDownloaderFactory {
 
-	@Override
-	protected Object createDownloader(Class<?> downloaderClass)	throws Exception {
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(downloaderClass);
-		enhancer.setCallback(new DownloadMointorIntercetor());
-		return enhancer.create();
-	}
+    public MonitorDownloaderFactory(Reflections reflections) {
+        super(reflections);
+    }
+
+    @Override
+    protected Object createDownloader(Class<?> downloaderClass) throws Exception {
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(downloaderClass);
+        enhancer.setCallback(new DownloadMointorIntercetor());
+        return enhancer.create();
+    }
 
 }

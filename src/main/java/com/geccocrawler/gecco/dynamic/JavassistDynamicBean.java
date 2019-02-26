@@ -161,7 +161,11 @@ public class JavassistDynamicBean implements DynamicBean {
                 getter(fieldName, f);
                 setter(fieldName, f);
             } catch (CannotCompileException ex) {
-                ex.printStackTrace();
+                if (log.isDebugEnabled()) {
+                    log.error(ex.getMessage(), ex);
+                } else {
+                    log.error(ex.getMessage());
+                }
             }
         }
         return new JavassistDynamicField(this, clazz, cpool, fieldName);
@@ -177,7 +181,11 @@ public class JavassistDynamicBean implements DynamicBean {
             CtMethod m = CtNewMethod.getter("get" + StringUtils.capitalize(fieldName), field);
             clazz.addMethod(m);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (log.isDebugEnabled()) {
+                log.error(ex.getMessage(), ex);
+            } else {
+                log.error(ex.getMessage());
+            }
         }
     }
 
@@ -186,7 +194,11 @@ public class JavassistDynamicBean implements DynamicBean {
             CtMethod m = CtNewMethod.setter("set" + StringUtils.capitalize(fieldName), field);
             clazz.addMethod(m);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            if (log.isDebugEnabled()) {
+                log.error(ex.getMessage(), ex);
+            } else {
+                log.error(ex.getMessage());
+            }
         }
     }
 
@@ -235,8 +247,6 @@ public class JavassistDynamicBean implements DynamicBean {
             e.printStackTrace();
             log.error(clazz.getName() + " cannot compile," + e.getMessage());
             return null;
-        } finally {
-            // clazz.detach();
         }
     }
 
