@@ -20,13 +20,11 @@ import com.geccocrawler.gecco.request.StartRequestList;
 import com.geccocrawler.gecco.scheduler.NoLoopStartScheduler;
 import com.geccocrawler.gecco.scheduler.Scheduler;
 import com.geccocrawler.gecco.scheduler.StartScheduler;
-import com.geccocrawler.gecco.spider.AbstractSpiderFactory;
-import com.geccocrawler.gecco.spider.DefaultSpiderFactory;
-import com.geccocrawler.gecco.spider.Spider;
-import com.geccocrawler.gecco.spider.SpiderBeanFactory;
+import com.geccocrawler.gecco.spider.*;
 import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import lombok.Getter;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
@@ -37,10 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 
@@ -50,7 +45,10 @@ import java.util.concurrent.CountDownLatch;
  * @author huchengyi
  */
 @CommonsLog
+@Getter
 public class GeccoEngine<V> extends Thread implements Callable<V> {
+    //----------------------------- 定义变量 start ---------------------------
+
     private Date startTime;
 
     private List<HttpRequest> startRequests = new ArrayList<>();
@@ -97,17 +95,16 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     private String jmxPrefix;
 
-    private V ret;//callable 返回值
+    /**
+     * callable 返回值
+     */
+    private V ret;
 
     private DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder;
 
-    public V getRet() {
-        return ret;
-    }
+    private SpiderFactoryBuilder spiderFactoryBuilder;
 
-    public void setRet(V ret) {
-        this.ret = ret;
-    }
+    //----------------------------- 定义变量 end ---------------------------
 
     private GeccoEngine() {
         this.retry = 3;
@@ -136,174 +133,6 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         GeccoEngine ge = create();
         ge.spiderBeanFactory = new SpiderBeanFactory(classpath, pipelineFactory, customFieldRenderFactory, downloaderFactoryBuilder, downloaderAOPFactoryBuilder);
         return ge;
-    }
-
-    public GeccoEngine start(String url) {
-        return start(new HttpGetRequest(url));
-    }
-
-    public GeccoEngine start(String... urls) {
-        for (String url : urls) {
-            start(url);
-        }
-        return this;
-    }
-
-    public GeccoEngine get(String url) {
-        return start(url);
-    }
-
-    public GeccoEngine get(String... urls) {
-        return start(urls);
-    }
-
-    public GeccoEngine post(String url) {
-        return start(new HttpPostRequest(url));
-    }
-
-    public GeccoEngine post(String url, Map<String, String> params) {
-        return start(new HttpPostRequest(url, params));
-    }
-
-    public GeccoEngine start(HttpRequest request) {
-        this.startRequests.add(request);
-        return this;
-    }
-
-    public GeccoEngine start(List<HttpRequest> requests) {
-        for (HttpRequest request : requests) {
-            start(request);
-        }
-        return this;
-    }
-
-    public GeccoEngine scheduler(Scheduler scheduler) {
-        this.scheduler = scheduler;
-        return this;
-    }
-
-    public GeccoEngine thread(int count) {
-        if (count <= 0) {
-            log.error("thread count must above than 0!");
-        } else {
-            this.threadCount = count;
-        }
-        return this;
-    }
-
-    public GeccoEngine interval(int interval) {
-        this.interval = interval;
-        return this;
-    }
-
-    public GeccoEngine retry(int retry) {
-        this.retry = retry;
-        return this;
-    }
-
-    public GeccoEngine loop(boolean loop) {
-        this.loop = loop;
-        return this;
-    }
-
-    public GeccoEngine proxysLoader(Proxys proxysLoader) {
-        this.proxysLoader = proxysLoader;
-        return this;
-    }
-
-    public GeccoEngine proxy(boolean proxy) {
-        this.proxy = proxy;
-        return this;
-    }
-
-    public GeccoEngine mobile(boolean mobile) {
-        this.mobile = mobile;
-        return this;
-    }
-
-    public GeccoEngine debug(boolean debug) {
-        this.debug = debug;
-        return this;
-    }
-
-    public GeccoEngine monitor(boolean monitor) {
-        this.monitor = monitor;
-        return this;
-    }
-
-    public GeccoEngine classpath(String classpath) {
-        this.classpath = classpath;
-        return this;
-    }
-
-    public GeccoEngine jmxPrefix(String jmxPrefix) {
-        this.jmxPrefix = jmxPrefix;
-        return this;
-    }
-
-    public GeccoEngine pipelineFactory(PipelineFactory pipelineFactory) {
-        this.pipelineFactory = pipelineFactory;
-        return this;
-    }
-
-    public GeccoEngine downloaderFactoryBuilder(DownloaderFactoryBuilder downloaderFactoryBuilder) {
-        this.downloaderFactoryBuilder = downloaderFactoryBuilder;
-        return this;
-    }
-
-    public GeccoEngine customFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
-        this.customFieldRenderFactory = customFieldRenderFactory;
-        return this;
-    }
-
-    public GeccoEngine spiderBeanFactory(SpiderBeanFactory spiderBeanFactory) {
-        this.spiderBeanFactory = spiderBeanFactory;
-        return this;
-    }
-
-    public boolean isWithStartsJson() {
-        return withStartsJson;
-    }
-
-    public GeccoEngine withStartsJson(boolean withStartsJson) {
-        this.withStartsJson = withStartsJson;
-        return this;
-    }
-
-    public String getStartsJson() {
-        return startsJson;
-    }
-
-    public GeccoEngine startsJson(String startsJson) {
-        this.startsJson = startsJson;
-        return this;
-    }
-
-    public void register(Class<?> spiderBeanClass) {
-        getSpiderBeanFactory().addSpiderBean(spiderBeanClass);
-    }
-
-    public void unregister(Class<?> spiderBeanClass) {
-        getSpiderBeanFactory().removeSpiderBean(spiderBeanClass);
-        DynamicGecco.unregister(spiderBeanClass);
-    }
-
-    public DownloaderAOPFactoryBuilder getDownloaderAOPFactoryBuilder() {
-        return downloaderAOPFactoryBuilder;
-    }
-
-    public GeccoEngine downloaderAOPFactoryBuilder(DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder) {
-        this.downloaderAOPFactoryBuilder = downloaderAOPFactoryBuilder;
-        return this;
-    }
-
-    public AbstractSpiderFactory getSpiderFactory() {
-        return spiderFactory;
-    }
-
-    public GeccoEngine spiderFactory(AbstractSpiderFactory spiderFactory) {
-        this.spiderFactory = spiderFactory;
-        return this;
     }
 
     @Override
@@ -350,17 +179,20 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             scheduler.into(startRequest);
         }
 
-        if (spiderFactory == null) {
-            spiderFactory = new DefaultSpiderFactory(threadCount, this);
-        }
+        spiderFactory = spiderFactoryBuilder == null ?
+                new DefaultSpiderFactory(threadCount, this) :
+                spiderFactoryBuilder.build(threadCount, this);
         spiderFactory.getSpiders().forEach(GlobalThreadFactory.INSTANCE::execute);
+
         startTime = new Date();
+
         if (monitor) {
             // 监控爬虫基本信息
             GeccoMonitor.monitor(this);
             // 启动导出jmx信息
             GeccoJmx.export(jmxPrefix == null ? classpath : jmxPrefix);
         }
+
         // 非循环模式等待线程执行完毕后关闭
         closeUnitlComplete();
     }
@@ -371,81 +203,6 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             eventListener.onStart(this);
         }
         super.start();
-    }
-
-    private GeccoEngine initStartsJson(String filename) {
-        try {
-            URL url = Resources.getResource(filename);
-            File file = new File(url.getPath());
-            if (file.exists()) {
-                String json = Files.asCharSource(file, StandardCharsets.UTF_8).read();
-                List<StartRequestList> list = JSON.parseArray(json, StartRequestList.class);
-                for (StartRequestList start : list) {
-                    start(start.toRequest());
-                }
-            }
-        } catch (IllegalArgumentException ex) {
-            log.info("starts.json not found");
-        } catch (IOException ioex) {
-            log.error(ioex);
-        }
-        return this;
-    }
-
-    public Scheduler getScheduler() {
-        return scheduler;
-    }
-
-    public SpiderBeanFactory getSpiderBeanFactory() {
-        return spiderBeanFactory;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public List<HttpRequest> getStartRequests() {
-        return startRequests;
-    }
-
-    public List<Spider> getSpiders() {
-        return spiderFactory.getSpiders();
-    }
-
-    public int getRetry() {
-        return retry;
-    }
-
-    public int getThreadCount() {
-        return threadCount;
-    }
-
-    public boolean isLoop() {
-        return loop;
-    }
-
-    public Proxys getProxysLoader() {
-        return proxysLoader;
-    }
-
-    public boolean isMobile() {
-        return mobile;
-    }
-
-    public boolean isDebug() {
-        return debug;
-    }
-
-    public boolean isProxy() {
-        return proxy;
-    }
-
-    public boolean isMonitor() {
-        return monitor;
     }
 
     /**
@@ -475,16 +232,6 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         if (eventListener != null) {
             eventListener.onStop(this);
         }
-    }
-
-    /**
-     * 启动引擎，并返回GeccoEngine对象
-     *
-     * @return GeccoEngine
-     */
-    public GeccoEngine engineStart() {
-        start();
-        return this;
     }
 
     /**
@@ -537,19 +284,233 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         }
     }
 
-    public EventListener getEventListener() {
-        return eventListener;
-    }
-
-    public GeccoEngine setEventListener(EventListener eventListener) {
-        this.eventListener = eventListener;
-        return this;
-    }
-
-
     @Override
     public V call() throws Exception {
         run();
         return ret;
     }
+
+    // ------------------------- setter start -------------------------------
+
+    private GeccoEngine<V> initStartsJson(String filename) {
+        try {
+            URL url = Resources.getResource(filename);
+            File file = new File(url.getPath());
+            if (file.exists()) {
+                String json = Files.asCharSource(file, StandardCharsets.UTF_8).read();
+                List<StartRequestList> list = JSON.parseArray(json, StartRequestList.class);
+                for (StartRequestList start : list) {
+                    start(start.toRequest());
+                }
+            }
+        } catch (IllegalArgumentException ex) {
+            log.info("starts.json not found");
+        } catch (IOException ioex) {
+            log.error(ioex);
+        }
+        return this;
+    }
+
+    /**
+     * 启动引擎，并返回GeccoEngine对象
+     *
+     * @return GeccoEngine
+     */
+    public GeccoEngine<V> engineStart() {
+        start();
+        return this;
+    }
+
+    public GeccoEngine<V> start(String url) {
+        return start(new HttpGetRequest(url));
+    }
+
+    public GeccoEngine<V> start(String... urls) {
+        Arrays.stream(urls).forEach(this::start);
+        return this;
+    }
+
+    public GeccoEngine<V> get(String url) {
+        return start(url);
+    }
+
+    public GeccoEngine<V> get(String... urls) {
+        return start(urls);
+    }
+
+    public GeccoEngine<V> post(String url) {
+        return start(new HttpPostRequest(url));
+    }
+
+    public GeccoEngine<V> post(String url, Map<String, String> params) {
+        return start(new HttpPostRequest(url, params));
+    }
+
+    public GeccoEngine<V> start(HttpRequest request) {
+        this.startRequests.add(request);
+        return this;
+    }
+
+    public GeccoEngine<V> start(List<HttpRequest> requests) {
+        requests.forEach(this::start);
+        return this;
+    }
+
+    public GeccoEngine<V> scheduler(Scheduler scheduler) {
+        this.scheduler = scheduler;
+        return this;
+    }
+
+    public GeccoEngine<V> thread(int count) {
+        if (count <= 0) {
+            log.error("thread count must above than 0!");
+        } else {
+            this.threadCount = count;
+        }
+        return this;
+    }
+
+    public GeccoEngine<V> interval(int interval) {
+        this.interval = interval;
+        return this;
+    }
+
+    public GeccoEngine<V> retry(int retry) {
+        this.retry = retry;
+        return this;
+    }
+
+    public GeccoEngine<V> loop(boolean loop) {
+        this.loop = loop;
+        return this;
+    }
+
+    public GeccoEngine<V> proxysLoader(Proxys proxysLoader) {
+        this.proxysLoader = proxysLoader;
+        return this;
+    }
+
+    public GeccoEngine<V> proxy(boolean proxy) {
+        this.proxy = proxy;
+        return this;
+    }
+
+    public GeccoEngine<V> mobile(boolean mobile) {
+        this.mobile = mobile;
+        return this;
+    }
+
+    public GeccoEngine<V> debug(boolean debug) {
+        this.debug = debug;
+        return this;
+    }
+
+    public GeccoEngine<V> monitor(boolean monitor) {
+        this.monitor = monitor;
+        return this;
+    }
+
+    public GeccoEngine<V> classpath(String classpath) {
+        this.classpath = classpath;
+        return this;
+    }
+
+    public GeccoEngine<V> jmxPrefix(String jmxPrefix) {
+        this.jmxPrefix = jmxPrefix;
+        return this;
+    }
+
+    public GeccoEngine<V> pipelineFactory(PipelineFactory pipelineFactory) {
+        this.pipelineFactory = pipelineFactory;
+        return this;
+    }
+
+    public GeccoEngine<V> downloaderFactoryBuilder(DownloaderFactoryBuilder downloaderFactoryBuilder) {
+        this.downloaderFactoryBuilder = downloaderFactoryBuilder;
+        return this;
+    }
+
+    public GeccoEngine<V> customFieldRenderFactory(CustomFieldRenderFactory customFieldRenderFactory) {
+        this.customFieldRenderFactory = customFieldRenderFactory;
+        return this;
+    }
+
+    public GeccoEngine<V> spiderBeanFactory(SpiderBeanFactory spiderBeanFactory) {
+        this.spiderBeanFactory = spiderBeanFactory;
+        return this;
+    }
+
+    public GeccoEngine<V> withStartsJson(boolean withStartsJson) {
+        this.withStartsJson = withStartsJson;
+        return this;
+    }
+
+    public GeccoEngine<V> startsJson(String startsJson) {
+        this.startsJson = startsJson;
+        return this;
+    }
+
+    public GeccoEngine<V> register(Class<?> spiderBeanClass) {
+        getSpiderBeanFactory().addSpiderBean(spiderBeanClass);
+        return this;
+    }
+
+    public GeccoEngine<V> unregister(Class<?> spiderBeanClass) {
+        getSpiderBeanFactory().removeSpiderBean(spiderBeanClass);
+        DynamicGecco.unregister(spiderBeanClass);
+        return this;
+    }
+
+    public GeccoEngine<V> downloaderAOPFactoryBuilder(DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder) {
+        this.downloaderAOPFactoryBuilder = downloaderAOPFactoryBuilder;
+        return this;
+    }
+
+    public GeccoEngine<V> spiderFactoryBuilder(SpiderFactoryBuilder spiderFactoryBuilder) {
+        this.spiderFactoryBuilder = spiderFactoryBuilder;
+        return this;
+    }
+
+    public GeccoEngine<V> ret(V ret) {
+        this.ret = ret;
+        return this;
+    }
+
+    public GeccoEngine<V> eventListener(EventListener eventListener) {
+        this.eventListener = eventListener;
+        return this;
+    }
+
+    // ------------------------- setter end -------------------------------
+    // ------------------------- getter start -------------------------------
+
+    public boolean isLoop() {
+        return loop;
+    }
+
+    public boolean isMobile() {
+        return mobile;
+    }
+
+    public boolean isDebug() {
+        return debug;
+    }
+
+    public boolean isProxy() {
+        return proxy;
+    }
+
+    public boolean isMonitor() {
+        return monitor;
+    }
+
+    public boolean isWithStartsJson() {
+        return withStartsJson;
+    }
+
+    public List<Spider> getSpiders() {
+        return spiderFactory.getSpiders();
+    }
+
+    // ------------------------- getter end -------------------------------
 }

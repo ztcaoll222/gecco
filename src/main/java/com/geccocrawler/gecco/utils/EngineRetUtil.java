@@ -9,7 +9,7 @@ public class EngineRetUtil {
     }
 
     public static void setRet(Object o) {
-        SpiderThreadLocal.get().getEngine().setRet(o);
+        SpiderThreadLocal.get().getEngine().ret(o);
     }
 
 }
