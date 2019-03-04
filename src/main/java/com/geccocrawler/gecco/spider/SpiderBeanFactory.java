@@ -213,7 +213,7 @@ public class SpiderBeanFactory {
                 if (StringUtils.isEmpty(pipelineName)) {
                     continue;
                 }
-                Pipeline pipeline = pipelineFactory.getPipeline(pipelineName);
+                Pipeline pipeline = pipelineFactory.get(pipelineName);
                 if (pipeline != null) {
                     pipelines.add(pipeline);
                 }

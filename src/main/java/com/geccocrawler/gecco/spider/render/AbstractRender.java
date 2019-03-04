@@ -56,7 +56,7 @@ public abstract class AbstractRender implements Render {
             for (Field customField : customFields) {
                 FieldRenderName fieldRender = customField.getAnnotation(FieldRenderName.class);
                 String name = fieldRender.value();
-                CustomFieldRender customFieldRender = customFieldRenderFactory.getCustomFieldRender(name);
+                CustomFieldRender customFieldRender = customFieldRenderFactory.get(name);
                 if (customFieldRender != null) {
                     customFieldRender.render(request, response, beanMap, bean, customField);
                 }

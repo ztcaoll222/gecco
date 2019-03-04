@@ -1,6 +1,6 @@
 package com.geccocrawler.gecco.downloader;
 
-import org.reflections.Reflections;
+import com.geccocrawler.gecco.interfaces.FactoryBuilder;
 
 /**
  * 下载器工厂类生成器
@@ -8,6 +8,5 @@ import org.reflections.Reflections;
  * @author ztcaoll222
  * Create time: 2019/1/30 14:25
  */
-public interface DownloaderFactoryBuilder {
-    AbstractDownloaderFactory build(Reflections reflections);
+public interface DownloaderFactoryBuilder extends FactoryBuilder<AbstractDownloaderFactory> {
 }

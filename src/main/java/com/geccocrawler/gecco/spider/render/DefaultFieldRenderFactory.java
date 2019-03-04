@@ -31,7 +31,7 @@ public class DefaultFieldRenderFactory implements CustomFieldRenderFactory {
     }
 
     @Override
-    public CustomFieldRender getCustomFieldRender(String name) {
+    public CustomFieldRender get(String name) {
         return map.get(name);
     }
 

@@ -2,6 +2,7 @@ package com.geccocrawler.gecco.request;
 
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +12,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 @CommonsLog
+@Data
 public abstract class AbstractHttpRequest implements HttpRequest, Comparable<HttpRequest>, Serializable {
 
     private static final long serialVersionUID = -7284636094595149962L;
@@ -21,11 +23,11 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     private String charset;
 
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters;
 
-    private Map<String, String> cookies;
+    private final Map<String, String> cookies;
 
-    private Map<String, String> headers;
+    private final Map<String, String> headers;
 
     private long priority;
 
@@ -83,11 +85,6 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters.putAll(parameters);
-    }
-
-    @Override
     public String getParameter(String name) {
         return parameters.get(name);
     }
@@ -115,48 +112,13 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
-    public String getUrl() {
-        return url;
-    }
-
-    @Override
-    public Map<String, String> getHeaders() {
-		/*StringBuffer sb = new StringBuffer();
-		for(Map.Entry<String, String> entry : cookies.entrySet()) {
-			sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
-		}
-		headers.put("Cookie", sb.toString());*/
-        return headers;
-    }
-
-    @Override
     public void refer(String refer) {
         this.addHeader("Referer", refer);
     }
 
     @Override
-    public Map<String, String> getParameters() {
-        return parameters;
-    }
-
-    @Override
-    public void setForceUseCharset(boolean forceUseCharset) {
-        this.forceUseCharset = forceUseCharset;
-    }
-
-    @Override
     public boolean isForceUseCharset() {
         return forceUseCharset;
-    }
-
-    @Override
-    public String getCharset() {
-        return charset;
-    }
-
-    @Override
-    public void setCharset(String charset) {
-        this.charset = charset;
     }
 
     @Override
@@ -170,18 +132,8 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
     }
 
     @Override
-    public long getPriority() {
-        return priority;
-    }
-
-    @Override
-    public void setPriority(long prio) {
-        this.priority = prio;
-    }
-
-    @Override
-    public Map<String, String> getCookies() {
-        return cookies;
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters.putAll(parameters);
     }
 
     @Override
@@ -204,30 +156,5 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
         String text = JSON.toJSONString(this);
         //反序列化
         return JSON.parseObject(text, this.getClass());
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((url == null) ? 0 : url.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        AbstractHttpRequest other = (AbstractHttpRequest) obj;
-        String otherJson = JSON.toJSONString(other);
-        String thisJson = JSON.toJSONString(this);
-        return otherJson.equals(thisJson);
     }
 }

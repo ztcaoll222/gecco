@@ -1,21 +1,25 @@
 package com.geccocrawler.gecco.request;
 
 import com.geccocrawler.gecco.config.GlobalConfig;
+import lombok.Data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class StartRequestList {
+@Data
+public class StartRequestList implements Serializable {
+	private static final long serialVersionUID = -8852418057148517662L;
 
 	private String url;
 
 	private String charset;
 
-	private Map<String, String> cookies;
+	private final Map<String, String> cookies;
 
-	private Map<String, String> headers;
+	private final Map<String, String> headers;
 
-	private Map<String, String> posts;
+	private final Map<String, String> posts;
 	
 	public StartRequestList() {
 		cookies = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
@@ -24,7 +28,7 @@ public class StartRequestList {
 	}
 	
 	public HttpRequest toRequest() {
-		if(posts != null && posts.size() > 0) {
+		if(posts.size() > 0) {
 			HttpPostRequest post = new HttpPostRequest(this.getUrl());
 			post.setCharset(charset);
 			post.setFields(posts);
@@ -51,45 +55,16 @@ public class StartRequestList {
 	public void addPost(String name, String value) {
 		posts.put(name, value);
 	}
-	
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
-	}
-
-	public String getCharset() {
-		return charset;
-	}
-
-	public void setCharset(String charset) {
-		this.charset = charset;
-	}
-
-	public Map<String, String> getCookies() {
-		return cookies;
-	}
 
 	public void setCookies(Map<String, String> cookies) {
-		this.cookies = cookies;
-	}
-
-	public Map<String, String> getHeaders() {
-		return headers;
+		this.cookies.putAll(cookies);
 	}
 
 	public void setHeaders(Map<String, String> headers) {
-		this.headers = headers;
-	}
-
-	public Map<String, String> getPosts() {
-		return posts;
+		this.headers.putAll(headers);
 	}
 
 	public void setPosts(Map<String, String> posts) {
-		this.posts = posts;
+		this.posts.putAll(posts);
 	}
-
 }

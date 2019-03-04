@@ -33,7 +33,7 @@ public class DefaultPipelineFactory implements PipelineFactory {
     }
 
     @Override
-    public Pipeline<? extends SpiderBean> getPipeline(String name) {
+    public Pipeline<? extends SpiderBean> get(String name) {
         return pipelines.get(name);
     }
 
