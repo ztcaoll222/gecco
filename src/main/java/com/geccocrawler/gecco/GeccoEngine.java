@@ -225,7 +225,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             if (spiderBeanFactory != null) {
                 spiderBeanFactory.getDownloaderFactory().closeAll();
             }
-            GeccoJmx.unexport();
+            if (monitor) {
+                GeccoJmx.unexport();
+            }
             log.info("close gecco!");
         }
 
