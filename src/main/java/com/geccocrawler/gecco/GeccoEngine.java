@@ -3,8 +3,10 @@ package com.geccocrawler.gecco;
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.common.GlobalThreadFactory;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import com.geccocrawler.gecco.downloader.DefaultUserAgent;
 import com.geccocrawler.gecco.downloader.DownloaderAOPFactoryBuilder;
 import com.geccocrawler.gecco.downloader.DownloaderFactoryBuilder;
+import com.geccocrawler.gecco.downloader.UserAgent;
 import com.geccocrawler.gecco.downloader.proxy.FileProxys;
 import com.geccocrawler.gecco.downloader.proxy.Proxys;
 import com.geccocrawler.gecco.dynamic.DynamicGecco;
@@ -79,9 +81,9 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     private boolean loop;
 
-    private boolean mobile;
+    private boolean mobile = false;
 
-    private boolean debug;
+    private boolean debug = false;
 
     private boolean withStartsJson = true;
 
@@ -103,6 +105,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
     private DownloaderAOPFactoryBuilder downloaderAOPFactoryBuilder;
 
     private SpiderFactoryBuilder spiderFactoryBuilder;
+
+    private UserAgent userAgent = new DefaultUserAgent();
 
     //----------------------------- 定义变量 end ---------------------------
 
@@ -480,6 +484,11 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     public GeccoEngine<V> eventListener(EventListener eventListener) {
         this.eventListener = eventListener;
+        return this;
+    }
+
+    public GeccoEngine<V> userAgent(UserAgent userAgent) {
+        this.userAgent = userAgent;
         return this;
     }
 

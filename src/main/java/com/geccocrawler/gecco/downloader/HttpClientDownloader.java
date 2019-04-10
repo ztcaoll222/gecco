@@ -116,14 +116,16 @@ public class HttpClientDownloader extends AbstractDownloader {
             reqObj = new HttpGet(request.getUrl());
         }
 
-        //header
+        // header
         boolean isMobile = SpiderThreadLocal.get().getEngine().isMobile();
-        reqObj.addHeader("User-Agent", UserAgent.getUserAgent(isMobile));
+        UserAgent userAgent = SpiderThreadLocal.get().getEngine().getUserAgent();
+        reqObj.addHeader("User-Agent", userAgent.getUserAgent(isMobile));
+
         for (Map.Entry<String, String> entry : request.getHeaders().entrySet()) {
             reqObj.setHeader(entry.getKey(), entry.getValue());
         }
 
-        //request config
+        // request config
         RequestConfig.Builder builder = RequestConfig.custom()
                 //从连接池获取连接的超时时间
                 .setConnectionRequestTimeout(1000)
