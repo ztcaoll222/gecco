@@ -1,5 +1,7 @@
 package com.geccocrawler.gecco.annotation;
 
+import com.geccocrawler.gecco.config.GlobalConfig;
+
 import java.lang.annotation.*;
 
 @Inherited
@@ -27,7 +29,7 @@ public @interface Gecco {
 	 * 
 	 * @return 下载超时时间
 	 */
-	int timeout() default 3000;
+	int timeout() default GlobalConfig.DEFAULT_TIMEOUT;
 	
 	/**
 	 * bean渲染完成后，后续的管道过滤器

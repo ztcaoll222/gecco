@@ -44,4 +44,9 @@ public class GlobalConfig {
      * 默认的线程数量
      */
     public static final int DEFAULT_THREAD_COUNT = 1;
+
+    /**
+     * 默认的超时时间
+     */
+    public static final int DEFAULT_TIMEOUT = 5000;
 }
