@@ -81,13 +81,17 @@ public class UrlMatcher {
             Pattern pattern2 = Pattern.compile(regex2);
             Matcher matcher2 = pattern2.matcher(url);
             if (matcher2.matches()) {
-                Map<String, String> params = new HashMap<String, String>(names.size());
+                Map<String, String> params = new HashMap<>(names.size());
                 for (int i = 1; i <= matcher2.groupCount(); i++) {
                     String value = matcher2.group(i);
                     try {
                         value = URLDecoder.decode(value, StandardCharsets.UTF_8.name());
                     } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
+                        if (log.isDebugEnabled()) {
+                            log.error(e.getMessage(), e);
+                        } else {
+                            log.error(e.getMessage());
+                        }
                     }
                     params.put(names.get(i - 1), value);
                 }
