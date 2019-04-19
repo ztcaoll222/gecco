@@ -26,7 +26,9 @@ import com.geccocrawler.gecco.spider.*;
 import com.geccocrawler.gecco.spider.render.CustomFieldRenderFactory;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Level;
@@ -93,7 +95,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     private int retry;
 
-    private EventListener eventListener;
+    @Setter(AccessLevel.NONE)
+    private List<EventListener> eventListenerList = new ArrayList<>();
 
     private String jmxPrefix;
 
@@ -203,9 +206,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
 
     @Override
     public synchronized void start() {
-        if (eventListener != null) {
-            eventListener.onStart(this);
-        }
+        eventListenerList.forEach(eventListener -> eventListener.onStart(this));
         super.start();
     }
 
@@ -235,9 +236,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
             log.info("close gecco!");
         }
 
-        if (eventListener != null) {
-            eventListener.onStop(this);
-        }
+        eventListenerList.forEach(eventListener -> eventListener.onStop(this));
     }
 
     /**
@@ -247,9 +246,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         if (spiderFactory != null) {
             spiderFactory.getSpiders().forEach(Spider::pause);
         }
-        if (eventListener != null) {
-            eventListener.onPause(this);
-        }
+
+        eventListenerList.forEach(eventListener -> eventListener.onPause(this));
     }
 
     /**
@@ -259,9 +257,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         if (spiderFactory != null) {
             spiderFactory.getSpiders().forEach(Spider::restart);
         }
-        if (eventListener != null) {
-            eventListener.onRestart(this);
-        }
+
+        eventListenerList.forEach(eventListener -> eventListener.onRestart(this));
     }
 
     public void beginUpdateRule() {
@@ -285,9 +282,8 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
         if (spiderFactory != null) {
             spiderFactory.getSpiders().forEach(Spider::stop);
         }
-        if (eventListener != null) {
-            eventListener.onStop(this);
-        }
+
+        eventListenerList.forEach(eventListener -> eventListener.onStop(this));
     }
 
     @Override
@@ -483,7 +479,7 @@ public class GeccoEngine<V> extends Thread implements Callable<V> {
     }
 
     public GeccoEngine<V> eventListener(EventListener eventListener) {
-        this.eventListener = eventListener;
+        this.eventListenerList.add(eventListener);
         return this;
     }
 
