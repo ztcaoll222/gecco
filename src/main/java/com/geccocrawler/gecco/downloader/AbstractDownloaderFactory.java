@@ -40,10 +40,7 @@ public abstract class AbstractDownloaderFactory {
 
     public Downloader getDownloader(String name) {
         Downloader downloader = downloaders.get(name);
-        if (downloader == null) {
-            return defaultDownloader();
-        }
-        return downloader;
+        return downloader == null ? defaultDownloader() : downloader;
     }
 
     public Downloader defaultDownloader() {

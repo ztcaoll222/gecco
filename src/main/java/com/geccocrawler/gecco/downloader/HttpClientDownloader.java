@@ -6,7 +6,7 @@ import com.geccocrawler.gecco.downloader.proxy.ProxysContext;
 import com.geccocrawler.gecco.exception.DownloadException;
 import com.geccocrawler.gecco.exception.DownloadServerException;
 import com.geccocrawler.gecco.exception.DownloadTimeoutException;
-import com.geccocrawler.gecco.request.HttpPostRequest;
+import com.geccocrawler.gecco.exception.MethodException;
 import com.geccocrawler.gecco.request.HttpRequest;
 import com.geccocrawler.gecco.response.HttpResponse;
 import com.geccocrawler.gecco.spider.SpiderThreadLocal;
@@ -100,20 +100,22 @@ public class HttpClientDownloader extends AbstractDownloader {
 
         HttpRequestBase reqObj = null;
 
-        if (request instanceof HttpPostRequest) {
-            //post
-            HttpPostRequest post = (HttpPostRequest) request;
-            reqObj = new HttpPost(post.getUrl());
-            //post fields
-            List<NameValuePair> fields = post.getFields().entrySet()
-                    .stream()
-                    .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
-                    .collect(Collectors.toList());
-            HttpEntity entity = new UrlEncodedFormEntity(fields, GlobalConfig.DEFAULT_CHARSET);
-            ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
-        } else {
-            //get
-            reqObj = new HttpGet(request.getUrl());
+        switch (request.getMethod()) {
+            case GET:
+                reqObj = new HttpGet(request.getUrl());
+                break;
+            case POST:
+                reqObj = new HttpPost(request.getUrl());
+                //post fields
+                List<NameValuePair> fields = request.getParameters().entrySet()
+                        .stream()
+                        .map(entry -> new BasicNameValuePair(entry.getKey(), entry.getValue()))
+                        .collect(Collectors.toList());
+                HttpEntity entity = new UrlEncodedFormEntity(fields, GlobalConfig.DEFAULT_CHARSET);
+                ((HttpEntityEnclosingRequestBase) reqObj).setEntity(entity);
+                break;
+            default:
+                throw new MethodException("request method: " + request.getMethod() + " is not support");
         }
 
         // header
@@ -240,7 +242,6 @@ public class HttpClientDownloader extends AbstractDownloader {
         } finally {
             instream.reset();
         }
-
     }
 
     private boolean isImage(String contentType) {

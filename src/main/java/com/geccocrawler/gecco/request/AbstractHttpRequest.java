@@ -2,6 +2,7 @@ package com.geccocrawler.gecco.request;
 
 import com.alibaba.fastjson.JSON;
 import com.geccocrawler.gecco.config.GlobalConfig;
+import com.geccocrawler.gecco.emuns.MethodEnum;
 import lombok.Data;
 import lombok.extern.apachecommons.CommonsLog;
 import org.apache.commons.lang3.StringUtils;
@@ -17,28 +18,31 @@ public abstract class AbstractHttpRequest implements HttpRequest, Comparable<Htt
 
     private static final long serialVersionUID = -7284636094595149962L;
 
-    private String url;
+    protected String url;
 
-    private boolean forceUseCharset = false;
+    protected boolean forceUseCharset = false;
 
-    private String charset;
+    protected String charset;
 
-    private final Map<String, String> parameters;
+    protected final Map<String, String> parameters;
 
-    private final Map<String, String> cookies;
+    protected final Map<String, String> cookies;
 
-    private final Map<String, String> headers;
+    protected final Map<String, String> headers;
 
-    private long priority;
+    protected long priority;
 
-    public AbstractHttpRequest() {
+    protected final MethodEnum method;
+
+    public AbstractHttpRequest(MethodEnum method) {
         this.parameters = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
         this.headers = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
         this.cookies = new HashMap<>(GlobalConfig.DEFAULT_COLLECTION_SIZE);
+        this.method = method;
     }
 
-    public AbstractHttpRequest(String url) {
-        this();
+    public AbstractHttpRequest(String url, MethodEnum method) {
+        this(method);
         this.setUrl(url);
     }
 

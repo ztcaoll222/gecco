@@ -31,7 +31,7 @@ public class StartRequestList implements Serializable {
 		if(posts.size() > 0) {
 			HttpPostRequest post = new HttpPostRequest(this.getUrl());
 			post.setCharset(charset);
-			post.setFields(posts);
+			post.setParameters(posts);
 			post.setCookies(cookies);
 			post.setHeaders(headers);
 			return post;

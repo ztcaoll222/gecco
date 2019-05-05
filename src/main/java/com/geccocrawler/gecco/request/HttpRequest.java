@@ -1,54 +1,58 @@
 package com.geccocrawler.gecco.request;
 
+import com.geccocrawler.gecco.emuns.MethodEnum;
+
 import java.util.Map;
 
 public interface HttpRequest extends Cloneable {
-	
-	public String getUrl();
-	
-	public void setUrl(String url);
-	
-	public void addParameter(String name, String value);
-	
-	public void setParameters(Map<String, String> parameters);
-	
-	public String getParameter(String name);
-	
-	public Map<String, String> getParameters();
-	
-	public void addHeader(String name, String value);
-	
-	public Map<String, String> getHeaders();
-	
-	public void clearHeader();
 
-	public void refer(String refer);
+	MethodEnum getMethod();
 	
-	public String getCharset();
+	String getUrl();
 	
-	public void setCharset(String charset);
+	void setUrl(String url);
 	
-	public void setForceUseCharset(boolean forceUseCharset);
+	void addParameter(String name, String value);
 	
-	public boolean isForceUseCharset();
+	void setParameters(Map<String, String> parameters);
 	
-	public HttpRequest subRequest(String url);
+	String getParameter(String name);
 	
-	public Map<String, String> getCookies();
+	Map<String, String> getParameters();
+	
+	void addHeader(String name, String value);
+	
+	Map<String, String> getHeaders();
+	
+	void clearHeader();
+
+	void refer(String refer);
+	
+	String getCharset();
+	
+	void setCharset(String charset);
+	
+	void setForceUseCharset(boolean forceUseCharset);
+	
+	boolean isForceUseCharset();
+	
+	HttpRequest subRequest(String url);
+	
+	Map<String, String> getCookies();
 
     void clearParams();
 
-    public void addCookie(String name, String value);
+    void addCookie(String name, String value);
 
-    public void setCookies(Map<String, String> cookies);
+    void setCookies(Map<String, String> cookies);
 	
-	public String getCookie(String name);
+	String getCookie(String name);
 	
-	public void clearCookie();
+	void clearCookie();
 
 	void setHeaders(Map<String, String> headers);
 
-	public long getPriority();
+	long getPriority();
 	
-	public void setPriority(long prio);
+	void setPriority(long prio);
 }
